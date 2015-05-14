@@ -12,5 +12,9 @@
             "name": "Ritalin",
             "homepage": "http://ritalin.github.io"
         }
-    ]
-}
+    ],
+    "autoload": {
+        "psr-4": {
+            "Omelet\\": "src/"
+        }
+    }}
