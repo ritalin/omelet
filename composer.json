@@ -1,0 +1,16 @@
+{
+    "name": "ritalin/omelet",
+    "description": "SQL-base object mapper.",
+    "require": {
+        "php": ">=5.5.0",
+        "doctrine/dbal": "~2.5"
+    },
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ritalin",
+            "homepage": "http://ritalin.github.io"
+        }
+    ]
+}
