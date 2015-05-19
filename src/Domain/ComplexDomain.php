@@ -4,8 +4,13 @@ namespace Omelet\Domain;
 
 class ComplexDomain extends DomainBase {
     private $domains;
+    private $boundOneArray = false;
     
     public function __construct(array $domains) {
+        if ((count($domains) === 1) && (current(array_values($domains)) instanceof ArrayDomain)) {
+            $this->boundOneArray = true;
+        }
+        
         $this->domains = $domains;
     }
     
@@ -17,7 +22,9 @@ class ComplexDomain extends DomainBase {
         return array_reduce(
             array_keys($this->domains),
             function (array &$tmp, $k) use($val) {
-                return $tmp + [$k => $this->domains[$k]->expandTypes($k, $val[$k])];
+                $n = $this->boundOneArray ? '' : $k;
+                
+                return $tmp + [$k => $this->domains[$k]->expandTypes($n, $val[$k])];
             },
             []
         );
@@ -27,7 +34,9 @@ class ComplexDomain extends DomainBase {
         return array_reduce(
             array_keys($this->domains),
             function (array &$tmp, $k) use($val) {
-                return $tmp + [$k => $this->domains[$k]->expandValues($k, $val[$k])];
+                $n = $this->boundOneArray ? '' : $k;
+                
+                return $tmp + [$k => $this->domains[$k]->expandValues($n, $val[$k])];
             },
             []
         );

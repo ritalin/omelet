@@ -40,4 +40,8 @@ class ArrayDomain extends DomainBase {
     public function childDomain() {
         return $this->child;
     }
+    
+    public static function __set_state($values) {
+        return new ArrayDomain($values['child']);
+    }
 }

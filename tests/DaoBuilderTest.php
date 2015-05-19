@@ -128,7 +128,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     private function exportDao(SQLLogger $logger = null) {
-        @mkdir('tests/exports', 755, true);
+        @mkdir('tests/fixtures/exports', 755, true);
         @copy('tests/fixtures/todo.orig.sqlite3', 'tests/fixtures/todo.sqlite3');
         
         $context = new DaoBuilderContext([
@@ -213,5 +213,28 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(2, $row['id']);
         $this->assertEquals("bbb", $row['todo']);
         $this->assertEquals(new \DateTime("2015/05/11"), new \DateTime($row['created']));
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_export_insert() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao($logger);
+        
+        $results = $dao->insert([
+            'id' => 4,
+            'todo' => 'test',
+            'created' => '2015-7-7 12:12:07',
+        ]);
+        
+        $results = $dao->listAll();
+        $this->assertCount(4, $results);
+
+        $row = $results[3];
+        $this->assertEquals(4, $row['id']);
+        $this->assertEquals("test", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/7/7 12:12:07"), new \DateTime($row['created']));
     }
 }
