@@ -282,5 +282,20 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         
         $this->assertCount(0, $results);
     }
+    
+    /**
+     * @Test
+     */
+    public function test_export_select_with_domain() {
+        $dao = $this->exportDao(TodoDao2::class);
+    
+        $results = $dao->listById(new PrimaryKey(2));
+        
+        $this->assertCount(1, $results);
 
+        $row = $results[0];
+        $this->assertEquals(2, $row['id']);
+        $this->assertEquals("bbb", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/05/11"), new \DateTime($row['created']));
+    }
 }
