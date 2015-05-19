@@ -8,6 +8,8 @@ use Doctrine\DBAL\Types\Type;
 use Omelet\Annotation\Core\DaoAnnotation;
 use Omelet\Annotation\ParamAlt;
 
+use Omelet\Annotation\Select;
+
 use Omelet\Domain\DomainFactory;
 use Omelet\Domain\ComplexDomain;
 
@@ -198,13 +200,22 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
                 $method['params']
             )
         );
-
+        
+        switch (get_class($method['type'])) {
+        case Select::class:
+            $caller = "fetchAll";
+            break;
+        default:
+            $caller = "execute";
+            break;
+        }
+        
         return 
 "    public function {$methodName}({$paramDefs}) {
         \$domain = {$domain};
         \$params = [$params];
         
-        return \$this->execute('$methodName', \$domain->expandValues('', \$params), \$domain->expandTypes('', \$params));
+        return \$this->{$caller}('$methodName', \$domain->expandValues('', \$params), \$domain->expandTypes('', \$params));
     }"
 
         ;

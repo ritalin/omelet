@@ -17,7 +17,7 @@ interface TodoDao {
     /**
      * @Select
      */
-    function findById($id);
+    function listById($id);
     /**
      * @Select
      * @ParamAlt(type=\DateTime::class, name="from")

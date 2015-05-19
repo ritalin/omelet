@@ -45,12 +45,12 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertCount(0, $info['paramDomain']->getChildren());
         }
         select2: {
-            $this->assertArrayHasKey('findById', $methods);
+            $this->assertArrayHasKey('listById', $methods);
             
-            $info = $methods['findById'];
+            $info = $methods['listById'];
             
             $this->assertArrayHasKey('name', $info);
-            $this->assertEquals('findById', $info['name']);
+            $this->assertEquals('listById', $info['name']);
             
             $this->assertArrayHasKey('type', $info);
             $this->assertInstanceOf('\Omelet\Annotation\Select', $info['type']);
@@ -184,7 +184,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     public function test_export_select_by_id() {
         $dao = $this->exportDao();
         
-        $results = $dao->findById(2);
+        $results = $dao->listById(2);
         $this->assertCount(1, $results);
 
         $row = $results[0];
@@ -236,5 +236,27 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(4, $row['id']);
         $this->assertEquals("test", $row['todo']);
         $this->assertEquals(new \DateTime("2015/7/7 12:12:07"), new \DateTime($row['created']));
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_export_update() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao($logger);
+        
+        $results = $dao->update([
+            'id' => 3,
+            'todo' => 'change content...',
+            'created' => '2015-7-7 10:10:10',
+        ]);
+        
+        $results = $dao->listById(3);
+        
+        $row = $results[0];
+        $this->assertEquals(3, $row['id']);
+        $this->assertEquals("change content...", $row['todo']);
+        $this->assertEquals(new \DateTime("2015-7-7 10:10:10"), new \DateTime($row['created']));
     }
 }
