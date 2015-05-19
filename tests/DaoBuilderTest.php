@@ -10,6 +10,8 @@ use Omelet\Builder\DaoBuilder;
 use Omelet\Domain\ComplexDomain;
 
 use Omelet\Tests\Target\TodoDao;
+use Omelet\Tests\Target\TodoDao2;
+use Omelet\Tests\Target\PrimaryKey;
 
 class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -127,7 +129,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
     }
     
-    private function exportDao(SQLLogger $logger = null) {
+    private function exportDao($intf, SQLLogger $logger = null) {
         @mkdir('tests/fixtures/exports', 755, true);
         @copy('tests/fixtures/todo.orig.sqlite3', 'tests/fixtures/todo.sqlite3');
         
@@ -135,7 +137,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             'sqlRootDir' => 'tests/fixtures/sql',
             'pdoDsn' => ['driver' => 'pdo_sqlite', 'path' => 'tests/fixtures/todo.sqlite3'],
         ]);
-        $builder = new DaoBuilder(new \ReflectionClass(TodoDao::class), $context->getDaoClassName(TodoDao::class));
+        $builder = new DaoBuilder(new \ReflectionClass($intf), $context->getDaoClassName($intf));
         
         $builder->prepare();
         $c = $builder->export(true);
@@ -157,7 +159,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      * @Test
      */
     public function test_export_select_all() {
-        $dao = $this->exportDao();
+        $dao = $this->exportDao(TodoDao::class);
         
         $results = $dao->listAll();
         $this->assertCount(3, $results);
@@ -182,7 +184,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      * @Test
      */
     public function test_export_select_by_id() {
-        $dao = $this->exportDao();
+        $dao = $this->exportDao(TodoDao::class);
         
         $results = $dao->listById(2);
         $this->assertCount(1, $results);
@@ -199,7 +201,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     public function test_export_select_with_range() {
         $logger = null;
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
-        $dao = $this->exportDao($logger);
+        $dao = $this->exportDao(TodoDao::class, $logger);
         
         $results = $dao->listByPub(new \DateTime('2015/4/30'), new \DateTime('2015/5/11'));
         $this->assertCount(2, $results);
@@ -221,13 +223,15 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     public function test_export_insert() {
         $logger = null;
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
-        $dao = $this->exportDao($logger);
+        $dao = $this->exportDao(TodoDao::class, $logger);
         
         $results = $dao->insert([
             'id' => 4,
             'todo' => 'test',
             'created' => '2015-7-7 12:12:07',
         ]);
+        
+        $this->assertEquals(1, $results);
         
         $results = $dao->listAll();
         $this->assertCount(4, $results);
@@ -244,13 +248,15 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     public function test_export_update() {
         $logger = null;
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
-        $dao = $this->exportDao($logger);
+        $dao = $this->exportDao(TodoDao::class, $logger);
         
         $results = $dao->update([
             'id' => 3,
             'todo' => 'change content...',
             'created' => '2015-7-7 10:10:10',
         ]);
+        
+        $this->assertEquals(1, $results);
         
         $results = $dao->listById(3);
         
@@ -259,4 +265,22 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals("change content...", $row['todo']);
         $this->assertEquals(new \DateTime("2015-7-7 10:10:10"), new \DateTime($row['created']));
     }
+    
+    /**
+     * @Test
+     */
+    public function test_export_delete() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao::class, $logger);
+    
+        $results = $dao->delete(2);
+        
+        $this->assertEquals(1, $results);
+        
+        $results = $dao->listById(2);
+        
+        $this->assertCount(0, $results);
+    }
+
 }
