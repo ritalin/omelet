@@ -33,14 +33,21 @@ class Todo {
      */
     public $hidden;
     
+    /**
+     * @param calable(Todo -> Void) fn
+     */
+    public function __construct(callable $fn = null) {
+        if ($fn !== null) {
+            $fn($this);
+        }
+    }
+    
     public static function __set_state($values) {
-        $obj = new Todo;
-        
-        $obj->id = $values['id'];
-        $obj->todo = $values['todo'];
-        $obj->created = $values['created'];
-        $obj->hidden = $values['hidden'];
-        
-        return $obj;
+        return new Todo(function($obj) use($values) {
+            $obj->id = $values['id'];
+            $obj->todo = $values['todo'];
+            $obj->created = $values['created'];
+            $obj->hidden = $values['hidden'];
+        });
     }
 }

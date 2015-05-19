@@ -41,4 +41,8 @@ class ObjectDomain extends DomainBase {
             []
         );
     }
+    
+    public static function __set_state($values) {
+        return new ObjectDomain($values['fields']);
+    }
 }

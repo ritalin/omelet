@@ -10,15 +10,15 @@ use Omelet\Annotation\ParamAlt;
 interface TodoDao2 {
     /**
      * @Select
-     * @ParamAlt(type="Omelet\Tests\Target\PrimaryKey", name="key")
+     * @ParamAlt(type="\Omelet\Tests\Target\PrimaryKey", name="key")
      * @param PrimaryKey key
      */
     function listById(PrimaryKey $key);
     
     /**
      * @Insert
-     * @ParamAlt(type="Omelet\Tests\Target\Todo", name="entity")
+     * @ParamAlt(type="\Omelet\Tests\Target\Todo", name="entity")
      * @param Todo entity
      */
-//    function insert(array $entity);
+    function insert(Todo $entity);
 }

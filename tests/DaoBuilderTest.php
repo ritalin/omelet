@@ -12,6 +12,7 @@ use Omelet\Domain\ComplexDomain;
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
 use Omelet\Tests\Target\PrimaryKey;
+use Omelet\Tests\Target\Todo;
 
 class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -297,5 +298,32 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(2, $row['id']);
         $this->assertEquals("bbb", $row['todo']);
         $this->assertEquals(new \DateTime("2015/05/11"), new \DateTime($row['created']));
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_export_insert_with_entity() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+        
+        $entity = new Todo(function($o) {
+            $o->id = 13;
+            $o->todo = "insert with entity";
+            $o->created = new \DateTime("2015-6-7 8:9:10");
+        });
+        $results = $dao->insert($entity);
+        
+        $this->assertEquals(1, $results);
+        
+        $results = $dao->listById(new PrimaryKey(13));
+        
+        $this->assertCount(1, $results);
+
+        $row = $results[0];
+        $this->assertEquals($entity->id, $row['id']);
+        $this->assertEquals($entity->todo, $row['todo']);
+        $this->assertEquals($entity->created, new \DateTime($row['created']));
     }
 }
