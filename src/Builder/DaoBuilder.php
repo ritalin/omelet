@@ -3,8 +3,13 @@
 namespace Omelet\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Types\Type;
 
 use Omelet\Annotation\Core\DaoAnnotation;
+use Omelet\Annotation\ParamAlt;
+
+use Omelet\Domain\DomainFactory;
+use Omelet\Domain\ComplexDomain;
 
 class DaoBuilder {
     /**
@@ -57,7 +62,49 @@ class DaoBuilder {
                     'name' => $m->name,
                     'type' => $this->extractQueryType($attrs),
                     'params' => $m->getParameters(),
+                    'paramDomain' => $this->paramToDomain($m->getParameters(), $attrs, $reader),
                 ]];
+            },
+            []
+        );
+    }
+    
+    private function paramToDomain(array $params, array $attrs, AnnotationReader $reader) {
+        $factory = new DomainFactory();
+
+        $paramDefs = $this->extractParamDefs($attrs);
+        
+        $domains = array_reduce(
+            $params,
+            function (&$tmp, \ReflectionParameter $p) use($reader, $factory, $paramDefs) {
+                if ((isset($paramDefs[$p->name])) ) {
+                    $t = $paramDefs[$p->name];
+                }
+                else if ($p->getClass() !== null) {
+                    $t = $p->getClass()->name;
+                }
+                else {
+                    $t = Type::STRING;
+                }
+
+                return $tmp + [$p->name => $factory->parse('', $t, $reader)];
+            },
+            []
+        );
+        
+        return new ComplexDomain($domains);
+    }
+    
+    private function extractParamDefs(array $attrs) {
+        $defs = array_filter(
+            $attrs,
+            function ($a) { return $a instanceof ParamAlt; }
+        );
+        
+        return array_reduce(
+            $defs,
+            function (array &$tmp, $d) {
+                return $tmp + [$d->name => $d->type];
             },
             []
         );
@@ -66,7 +113,7 @@ class DaoBuilder {
     public function export($return = false) {
         $classDef = $this->classTemplate();
         $methodDefs = array_map(
-            function (\ReflectionMethod $m) {
+            function (array $m) {
                 return $this->methodTemplate($m);
             },
             $this->methods
@@ -100,14 +147,15 @@ class DaoBuilder {
 $ns
 /// Auto-generated class 
 
-use MyVendor\Weekday\Module\Query\DaoBase;
-use MyVendor\Weekday\Module\Query\DaoBuilderContext;
+use Omelet;
+use Omelet\Core\DaoBase;
+use Omelet\Builder\DaoBuilderContext;
 
 use Doctrine\DBAL\Driver\Connection;
 
 class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
-        parent::__construct(\$conn, \$context->queriesOf('{$this->intfName}'));
+        parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'));
     }
     
 %s
@@ -116,31 +164,47 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
          ;
     }
     
-    private function methodTemplate(\ReflectionMethod $method) {
+    private function extractTypeHint(\ReflectionParameter $p) {
+        $hint = $p->getClass();
+        
+        if (isset($hint)) {
+            return "\\{$hint->name} ";
+        }
+        else if ($p->isArray()) {
+            return "array ";
+        }
+        else {
+            return "";
+        }
+    }
+    
+    private function methodTemplate(array $method) {
         $paramDefs = implode(', ', 
             array_map(
                 function (\ReflectionParameter $p) {
-                    $hint = $p->getClass();
-                    
-                    return (isset($hint) ? "\\{$hint->getName()} ": "") . "\${$p->getName()}";
+                    return $this->extractTypeHint($p) . "\${$p->name}";
                 },
-                $method->getParameters()
+                $method['params']
             )
         );
-        
+
+        $methodName = $method['name'];
+        $domain = var_export($method['paramDomain'], true);
         $params = implode(', ', 
             array_map(
                 function (\ReflectionParameter $p) {
                     return "'{$p->name}' => \${$p->name}";
                 },
-                $method->getParameters()
+                $method['params']
             )
         );
-        $methodName = $method->getName();
-        
+
         return 
 "    public function {$methodName}({$paramDefs}) {
-        return \$this->execute( '$methodName', [{$params}]);
+        \$domain = {$domain};
+        \$params = [$params];
+        
+        return \$this->execute('$methodName', \$domain->expandValues('', \$params), \$domain->expandTypes('', \$params));
     }"
 
         ;

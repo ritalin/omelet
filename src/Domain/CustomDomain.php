@@ -18,7 +18,7 @@ abstract class CustomDomain extends DomainBase {
     }
     
     protected function expandTypesInternal($name, $val) {
-        return [$name => $this->type];
+        return [$name => Type::getType($this->type)];
     }
     
     protected function expandValuesInternal($name, $val) {

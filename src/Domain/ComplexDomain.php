@@ -32,4 +32,8 @@ class ComplexDomain extends DomainBase {
             []
         );
     }
+    
+    public static function __set_state($values) {
+        return new ComplexDomain($values['domains']);
+    }
 }

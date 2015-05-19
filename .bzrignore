@@ -1,2 +1,4 @@
 ./composer.lock
 vendor
+tests/fixtures/exports
+tests/fixtures/todo.sqlite3

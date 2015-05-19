@@ -2,17 +2,21 @@
 
 namespace OmeletTests;
 
+use Doctrine\DBAL\Logging\SQLLogger;
+
 use Omelet\Builder\DaoBuilderContext;
 use Omelet\Builder\DaoBuilder;
+
+use Omelet\Domain\ComplexDomain;
+
 use Omelet\Tests\Target\TodoDao;
 
 class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @test
+     * @Test
      */
-     public function test_build() {
+     public function test_build_prepare() {
         $context = new DaoBuilderContext();
-        
         $builder = new DaoBuilder(new \ReflectionClass(TodoDao::class), $context->getDaoClassName(TodoDao::class));
         
         $this->assertEquals('Omelet\Tests\Target\TodoDao', $builder->getInterfaceName());
@@ -36,8 +40,9 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('type', $info);
             $this->assertInstanceOf('\Omelet\Annotation\Select', $info['type']);
             
-            $this->assertArrayHasKey('params', $info);
-            $this->assertCount(0, $info['params']);
+            $this->assertArrayHasKey('paramDomain', $info);
+            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertCount(0, $info['paramDomain']->getChildren());
         }
         select2: {
             $this->assertArrayHasKey('findById', $methods);
@@ -50,8 +55,10 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('type', $info);
             $this->assertInstanceOf('\Omelet\Annotation\Select', $info['type']);
             
-            $this->assertArrayHasKey('params', $info);
-            $this->assertCount(1, $info['params']);
+            $this->assertArrayHasKey('paramDomain', $info);
+            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertCount(1, $info['paramDomain']->getChildren());
+            $this->assertArrayHasKey('id', $info['paramDomain']->getChildren());
         }
         select3: {
             $this->assertArrayHasKey('listByPub', $methods);
@@ -64,8 +71,11 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('type', $info);
             $this->assertInstanceOf('\Omelet\Annotation\Select', $info['type']);
             
-            $this->assertArrayHasKey('params', $info);
-            $this->assertCount(2, $info['params']);
+            $this->assertArrayHasKey('paramDomain', $info);
+            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertCount(2, $info['paramDomain']->getChildren());
+            $this->assertArrayHasKey('from', $info['paramDomain']->getChildren());
+            $this->assertArrayHasKey('to', $info['paramDomain']->getChildren());
         }
         insert: {
             $this->assertArrayHasKey('insert', $methods);
@@ -78,8 +88,10 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('type', $info);
             $this->assertInstanceOf('\Omelet\Annotation\Insert', $info['type']);
             
-            $this->assertArrayHasKey('params', $info);
-            $this->assertCount(1, $info['params']);
+            $this->assertArrayHasKey('paramDomain', $info);
+            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertCount(1, $info['paramDomain']->getChildren());
+            $this->assertArrayHasKey('fields', $info['paramDomain']->getChildren());
         }
         update: {
             $this->assertArrayHasKey('update', $methods);
@@ -92,8 +104,10 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('type', $info);
             $this->assertInstanceOf('\Omelet\Annotation\Update', $info['type']);
             
-            $this->assertArrayHasKey('params', $info);
-            $this->assertCount(1, $info['params']);
+            $this->assertArrayHasKey('paramDomain', $info);
+            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertCount(1, $info['paramDomain']->getChildren());
+            $this->assertArrayHasKey('fields', $info['paramDomain']->getChildren());
         }
         delete: {
             $this->assertArrayHasKey('delete', $methods);
@@ -106,9 +120,98 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertArrayHasKey('type', $info);
             $this->assertInstanceOf('\Omelet\Annotation\Delete', $info['type']);
             
-            $this->assertArrayHasKey('params', $info);
-            $this->assertCount(1, $info['params']);
+            $this->assertArrayHasKey('paramDomain', $info);
+            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertCount(1, $info['paramDomain']->getChildren());
+            $this->assertArrayHasKey('id', $info['paramDomain']->getChildren());
         }
+    }
+    
+    private function exportDao(SQLLogger $logger = null) {
+        @mkdir('tests/exports', 755, true);
+        @copy('tests/fixtures/todo.orig.sqlite3', 'tests/fixtures/todo.sqlite3');
         
+        $context = new DaoBuilderContext([
+            'sqlRootDir' => 'tests/fixtures/sql',
+            'pdoDsn' => ['driver' => 'pdo_sqlite', 'path' => 'tests/fixtures/todo.sqlite3'],
+        ]);
+        $builder = new DaoBuilder(new \ReflectionClass(TodoDao::class), $context->getDaoClassName(TodoDao::class));
+        
+        $builder->prepare();
+        $c = $builder->export(true);
+        
+        $implClass = basename($builder->getClassName());
+        $path = "tests/fixtures/exports/{$implClass}.php";
+        file_put_contents($path, $c);
+        
+        require_once $path;
+      
+        $implClass = $builder->getClassName();
+        $conn = \Doctrine\DBAL\DriverManager::getConnection($context->getConfig()['pdoDsn']);
+        $conn->getConfiguration()->setSQLLogger($logger);
+        
+        return new $implClass($conn, $context);
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_export_select_all() {
+        $dao = $this->exportDao();
+        
+        $results = $dao->listAll();
+        $this->assertCount(3, $results);
+
+        $row = $results[0];
+        $this->assertEquals(1, $row['id']);
+        $this->assertEquals("aaa", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/05/01"), new \DateTime($row['created']));
+
+        $row = $results[1];
+        $this->assertEquals(2, $row['id']);
+        $this->assertEquals("bbb", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/05/11"), new \DateTime($row['created']));
+
+        $row = $results[2];
+        $this->assertEquals(3, $row['id']);
+        $this->assertEquals("ccc", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/05/21 13:05:21"), new \DateTime($row['created']));
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_export_select_by_id() {
+        $dao = $this->exportDao();
+        
+        $results = $dao->findById(2);
+        $this->assertCount(1, $results);
+
+        $row = $results[0];
+        $this->assertEquals(2, $row['id']);
+        $this->assertEquals("bbb", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/05/11"), new \DateTime($row['created']));
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_export_select_with_range() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao($logger);
+        
+        $results = $dao->listByPub(new \DateTime('2015/4/30'), new \DateTime('2015/5/11'));
+        $this->assertCount(2, $results);
+
+        $row = $results[0];
+        $this->assertEquals(1, $row['id']);
+        $this->assertEquals("aaa", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/05/01"), new \DateTime($row['created']));
+
+        $row = $results[1];
+        $this->assertEquals(2, $row['id']);
+        $this->assertEquals("bbb", $row['todo']);
+        $this->assertEquals(new \DateTime("2015/05/11"), new \DateTime($row['created']));
     }
 }

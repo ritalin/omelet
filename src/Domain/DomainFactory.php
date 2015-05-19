@@ -14,6 +14,7 @@ final class DomainFactory {
         'bool'      => Types\Type::BOOLEAN,
         'double'    => Types\Type::FLOAT,
         '\DateTime' => Types\Type::DATETIME,
+        'DateTime' => Types\Type::DATETIME,
     ];
 
     public function parse($name, $type, AnnotationReader $reader) {

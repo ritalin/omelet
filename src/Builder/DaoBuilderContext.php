@@ -40,9 +40,9 @@ class DaoBuilderContext {
     }
     
     public function queriesOf($intfName) {
-        $rootDir = $this->config['sqlRootDir'] . '/' . ToDoDao::class;
+        $rootDir = $this->config['sqlRootDir'] . $intfName;
         
-        $t = new \ReflectionClass(ToDoDao::class);
+        $t = new \ReflectionClass($intfName);
         
         return array_reduce(
             $t->getMethods(),

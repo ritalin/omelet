@@ -13,7 +13,7 @@ class DaoBase {
         $this->queries = $queries;
     }
     
-    protected function execute($key, array $params) {
-        return $this->conn->fetchAll($this->queries[$key], $params);
+    protected function execute($key, array $params, array $types) {
+        return $this->conn->fetchAll($this->queries[$key], $params, $types);
     }
 }

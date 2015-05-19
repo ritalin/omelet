@@ -16,10 +16,14 @@ class BuiltinDomain extends DomainBase {
     }
     
     protected function expandTypesInternal($name, $val) {
-        return [$name => $this->type];
+        return [$name => Type::getType($this->type)];
     }
     
     protected function expandValuesInternal($name, $val) {
         return [$name => $val];
+    }
+    
+    public static function __set_state($values) {
+        return new BuiltinDomain($values['type']);
     }
 }
