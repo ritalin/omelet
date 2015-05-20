@@ -1,6 +1,7 @@
 {
     "name": "ritalin/omelet",
-    "description": "SQL-base object mapper.",
+    "description": "SQL base object mapper for php",
+    "keywords": ["database", "orm"],
     "require": {
         "php": ">=5.5.0",
         "doctrine/dbal": "~2.5",
