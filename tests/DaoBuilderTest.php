@@ -3,11 +3,14 @@
 namespace OmeletTests;
 
 use Doctrine\DBAL\Logging\SQLLogger;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Types\Type;
 
 use Omelet\Builder\DaoBuilderContext;
 use Omelet\Builder\DaoBuilder;
 
-use Omelet\Domain\ComplexDomain;
+use Omelet\Domain;
+use Omelet\Domain\DomainFactory;
 
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
@@ -44,7 +47,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertInstanceOf('\Omelet\Annotation\Select', $info['type']);
             
             $this->assertArrayHasKey('paramDomain', $info);
-            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertInstanceOf(Domain\ComplexDomain::class, $info['paramDomain']);
             $this->assertCount(0, $info['paramDomain']->getChildren());
         }
         select2: {
@@ -59,7 +62,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertInstanceOf('\Omelet\Annotation\Select', $info['type']);
             
             $this->assertArrayHasKey('paramDomain', $info);
-            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertInstanceOf(Domain\ComplexDomain::class, $info['paramDomain']);
             $this->assertCount(1, $info['paramDomain']->getChildren());
             $this->assertArrayHasKey('id', $info['paramDomain']->getChildren());
         }
@@ -75,7 +78,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertInstanceOf('\Omelet\Annotation\Select', $info['type']);
             
             $this->assertArrayHasKey('paramDomain', $info);
-            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertInstanceOf(Domain\ComplexDomain::class, $info['paramDomain']);
             $this->assertCount(2, $info['paramDomain']->getChildren());
             $this->assertArrayHasKey('from', $info['paramDomain']->getChildren());
             $this->assertArrayHasKey('to', $info['paramDomain']->getChildren());
@@ -92,7 +95,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertInstanceOf('\Omelet\Annotation\Insert', $info['type']);
             
             $this->assertArrayHasKey('paramDomain', $info);
-            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertInstanceOf(Domain\ComplexDomain::class, $info['paramDomain']);
             $this->assertCount(1, $info['paramDomain']->getChildren());
             $this->assertArrayHasKey('fields', $info['paramDomain']->getChildren());
         }
@@ -108,7 +111,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertInstanceOf('\Omelet\Annotation\Update', $info['type']);
             
             $this->assertArrayHasKey('paramDomain', $info);
-            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertInstanceOf(Domain\ComplexDomain::class, $info['paramDomain']);
             $this->assertCount(1, $info['paramDomain']->getChildren());
             $this->assertArrayHasKey('fields', $info['paramDomain']->getChildren());
         }
@@ -124,7 +127,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertInstanceOf('\Omelet\Annotation\Delete', $info['type']);
             
             $this->assertArrayHasKey('paramDomain', $info);
-            $this->assertInstanceOf(ComplexDomain::class, $info['paramDomain']);
+            $this->assertInstanceOf(Domain\ComplexDomain::class, $info['paramDomain']);
             $this->assertCount(1, $info['paramDomain']->getChildren());
             $this->assertArrayHasKey('id', $info['paramDomain']->getChildren());
         }
@@ -299,7 +302,65 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals("bbb", $row['todo']);
         $this->assertEquals(new \DateTime("2015/05/11"), new \DateTime($row['created']));
     }
-    
+
+    /**
+     * @Test
+     */
+    public function test_build_prepare_with_returning() {
+        $context = new DaoBuilderContext();
+        $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
+        
+        $reader = new AnnotationReader();
+        $factory = new DomainFactory();
+        
+        $builder->prepare();
+        $methods = $builder->getMethods();
+        
+        listById: {
+            $info = $methods['listById'];
+
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
+            $this->assertInstanceOf(Domain\BuiltinDomain::class, $info['returnDomain']->childDomain());
+            $this->assertEquals(Type::STRING, $info['returnDomain']->childDomain()->getType());
+        }
+        listAll: {
+            $info = $methods['listAll'];
+            $actial = $factory->parse('', Todo::class, $reader);
+        
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
+            $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']->childDomain());
+            $this->assertEquals($actial, $info['returnDomain']->childDomain());
+        }
+        listAllAsRawArray: {
+            $info = $methods['listAllAsRawArray'];
+            $actial = $factory->parse('', Todo::class, $reader);
+        
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
+            $this->assertInstanceOf(Domain\BuiltinDomain::class, $info['returnDomain']->childDomain());
+            $this->assertEquals(Type::STRING, $info['returnDomain']->childDomain()->getType());
+        }
+        listByPub: {
+            $info = $methods['listByPub'];
+            $actial = $factory->parse('', Todo::class, $reader);
+        
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
+            $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']->childDomain());
+            $this->assertEquals($actial, $info['returnDomain']->childDomain());
+        }
+        findById: {
+            $info = $methods['findById'];
+            $actial = $factory->parse('', Todo::class, $reader);
+        
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']);
+            $this->assertEquals($actial, $info['returnDomain']);
+        }
+    }
+   
     /**
      * @Test
      */

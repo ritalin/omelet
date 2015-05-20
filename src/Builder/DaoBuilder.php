@@ -9,6 +9,7 @@ use Omelet\Annotation\Core\DaoAnnotation;
 use Omelet\Annotation\ParamAlt;
 
 use Omelet\Annotation\Select;
+use Omelet\Annotation\Returning;
 
 use Omelet\Domain\DomainFactory;
 use Omelet\Domain\ComplexDomain;
@@ -24,9 +25,15 @@ class DaoBuilder {
     private $className;
     private $methods = [];
     
+    /**
+     * @var DomainFactory
+     */
+    private $factory;
+    
     public function __construct(\ReflectionClass $intf, $className) {
         $this->intf = $intf;
         $this->className = $className;
+        $this->factory = new DomainFactory();
     }
     
     public function getInterfaceName() {
@@ -41,11 +48,11 @@ class DaoBuilder {
         return $this->methods;
     }
     
-    private function extractQueryType(array $attrs) {
+    private function extractAnnotation(array $attrs, $class) {
         $results = array_filter(
             $attrs,
-            function ($a) {
-                return ($a instanceof DaoAnnotation);
+            function ($a) use($class) {
+                return ($a instanceof $class);
             }
         );
         
@@ -62,9 +69,10 @@ class DaoBuilder {
 
                 return $tmp + [$m->name => [
                     'name' => $m->name,
-                    'type' => $this->extractQueryType($attrs),
+                    'type' => $this->extractAnnotation($attrs, DaoAnnotation::class),
                     'params' => $m->getParameters(),
                     'paramDomain' => $this->paramToDomain($m->getParameters(), $attrs, $reader),
+                    'returnDomain' => $this->returningToDomain($attrs, $reader),
                 ]];
             },
             []
@@ -72,13 +80,11 @@ class DaoBuilder {
     }
     
     private function paramToDomain(array $params, array $attrs, AnnotationReader $reader) {
-        $factory = new DomainFactory();
-
         $paramDefs = $this->extractParamDefs($attrs);
         
         $domains = array_reduce(
             $params,
-            function (&$tmp, \ReflectionParameter $p) use($reader, $factory, $paramDefs) {
+            function (&$tmp, \ReflectionParameter $p) use($reader, $paramDefs) {
                 if ((isset($paramDefs[$p->name])) ) {
                     $t = $paramDefs[$p->name];
                 }
@@ -89,12 +95,18 @@ class DaoBuilder {
                     $t = Type::STRING;
                 }
 
-                return $tmp + [$p->name => $factory->parse('', $t, $reader)];
+                return $tmp + [$p->name => $this->factory->parse('', $t, $reader)];
             },
             []
         );
         
         return new ComplexDomain($domains);
+    }
+    
+    private function returningToDomain(array $attrs, AnnotationReader $reader) {
+        $returning = $this->extractAnnotation($attrs, Returning::class);
+        
+        return $this->factory->parse('', isset($returning) ? $returning->type : 'array', $reader);
     }
     
     private function extractParamDefs(array $attrs) {
