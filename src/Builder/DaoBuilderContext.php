@@ -39,8 +39,12 @@ class DaoBuilderContext {
         ));
     }
     
+    private function normalizePath($path) {
+        return str_replace(['/', "\\"], DIRECTORY_SEPARATOR, $path);
+    }
+
     public function queriesOf($intfName) {
-        $rootDir = $this->config['sqlRootDir'] . $intfName;
+        $rootDir = $this->normalizePath($this->config['sqlRootDir'] . $intfName);
         
         $t = new \ReflectionClass($intfName);
         
@@ -62,13 +66,12 @@ class DaoBuilderContext {
         $classPath = $this->config['daoClassPath'];
         $className = $this->getDaoClassName($intfName);
         
-        $setting = new DaoBuilder(new \ReflectionClass($intfName), $className);
-        
-        $path = "{$classPath}/{$className}.php";
+        $path = $this->normalizePath("{$classPath}/{$className}.php");
         if (! file_exists(dirname($path))) {
             mkdir(dirname($path), 0777, true);
         }
         
+        $setting = new DaoBuilder(new \ReflectionClass($intfName), $className);
         $setting->prepare();
         
         file_put_contents($path, $setting->export(true));

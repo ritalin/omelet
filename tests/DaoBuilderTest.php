@@ -135,7 +135,9 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     private function exportDao($intf, SQLLogger $logger = null) {
-        @mkdir('tests/fixtures/exports', 755, true);
+        if (! file_exists('tests/fixtures/exports')) {
+            @mkdir('tests/fixtures/exports', 0777, true);
+        }
         @copy('tests/fixtures/todo.orig.sqlite3', 'tests/fixtures/todo.sqlite3');
         
         $context = new DaoBuilderContext([

@@ -1,0 +1,5 @@
+composer.lock
+tests/fixtures/.DS_Store
+tests/fixtures/exports/
+tests/fixtures/todo.sqlite3
+vendor/
