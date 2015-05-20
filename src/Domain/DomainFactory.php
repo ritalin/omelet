@@ -35,7 +35,7 @@ final class DomainFactory {
         }
         
         if (is_subclass_of($type, DomainBase::class)) {
-            return new WrappedDomain();
+            return new WrappedDomain($type);
         }
         
         if (class_exists($type)) {

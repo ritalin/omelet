@@ -4,6 +4,8 @@ namespace Omelet\Core;
 
 use Doctrine\DBAL\Driver\Connection;
 
+use Omelet\Domain\DomainBase;
+
 class DaoBase {
     private $conn;
     private $queries;
@@ -19,5 +21,9 @@ class DaoBase {
     
     protected function execute($key, array $params, array $types) {
         return $this->conn->executeUpdate($this->queries[$key], $params, $types);
+    }
+    
+    protected function convertResults($results, DomainBase $domain) {
+        return $domain->convertResults($results, $this->conn->getDatabasePlatform());
     }
 }

@@ -56,6 +56,26 @@ interface TodoDao2 {
     function findById(PrimaryKey $key);
     
     /**
+     * @Select
+     * @ParamAlt(type="int", name="id")
+     * @Returning(type="bool")
+     *
+     * @param int key
+     * return bool
+     */
+    function exists($id);
+    
+    /**
+     * @Select
+     * @ParamAlt(type="int", name="id")
+     * @Returning(type="\Omelet\Tests\Target\Existance")
+     *
+     * @param int key
+     * return Existance
+     */
+    function existsAsDomain($id);
+    
+    /**
      * @Insert
      * @ParamAlt(type="\Omelet\Tests\Target\Todo", name="entity")
      *

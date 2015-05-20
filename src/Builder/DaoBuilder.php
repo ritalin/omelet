@@ -104,9 +104,14 @@ class DaoBuilder {
     }
     
     private function returningToDomain(array $attrs, AnnotationReader $reader) {
-        $returning = $this->extractAnnotation($attrs, Returning::class);
-        
-        return $this->factory->parse('', isset($returning) ? $returning->type : 'array', $reader);
+        if ($this->extractAnnotation($attrs, Select::class) !== null) {
+            $returning = $this->extractAnnotation($attrs, Returning::class);
+            
+            return $this->factory->parse('', isset($returning) ? $returning->type : 'array', $reader);
+        }
+        else {
+            return $this->factory->parse('', 'int', $reader);
+        }
     }
     
     private function extractParamDefs(array $attrs) {
@@ -212,6 +217,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
                 $method['params']
             )
         );
+        $returning = var_export($method['returnDomain'], true);
         
         switch (get_class($method['type'])) {
         case Select::class:
@@ -224,10 +230,13 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         
         return 
 "    public function {$methodName}({$paramDefs}) {
-        \$domain = {$domain};
+        \$paramDomain = {$domain};
         \$params = [$params];
+        \$returnDomain = {$returning};
         
-        return \$this->{$caller}('$methodName', \$domain->expandValues('', \$params), \$domain->expandTypes('', \$params));
+        \$rows = \$this->{$caller}('$methodName', \$paramDomain->expandValues('', \$params), \$paramDomain->expandTypes('', \$params));
+        
+        return \$this->convertResults(\$rows, \$returnDomain);
     }"
 
         ;

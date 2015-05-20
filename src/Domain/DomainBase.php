@@ -2,6 +2,8 @@
 
 namespace Omelet\Domain;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 abstract class DomainBase {
     protected abstract function expandTypesInternal($name, $val);
     protected abstract function expandValuesInternal($name, $val);
@@ -26,5 +28,9 @@ abstract class DomainBase {
             },
             []
         );
+    }
+    
+    public function convertResults($results, AbstractPlatform $platform) {
+        return null;
     }
 }

@@ -2,6 +2,9 @@
 
 namespace Omelet\Domain;
 
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 class ArrayDomain extends DomainBase {
     private $child;
     
@@ -43,5 +46,11 @@ class ArrayDomain extends DomainBase {
     
     public static function __set_state($values) {
         return new ArrayDomain($values['child']);
+    }
+
+    public function convertResults($results, AbstractPlatform $platform) {
+        if (($this->child instanceof BuiltinDomain) && ($this->child->getType() === Type::STRING)) {
+            return $results;
+        }
     }
 }

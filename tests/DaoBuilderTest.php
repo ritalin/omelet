@@ -14,6 +14,7 @@ use Omelet\Domain\DomainFactory;
 
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
+use Omelet\Tests\Target\Existance;
 use Omelet\Tests\Target\PrimaryKey;
 use Omelet\Tests\Target\Todo;
 
@@ -361,6 +362,64 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
     }
    
+    /**
+     * @Test
+     */
+    public function test_export_select_returning_primitive() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+    
+        $results = $dao->exists(1);
+        $this->assertSame(true, $results);
+    
+        $results = $dao->exists(999);
+        $this->assertSame(false, $results);
+    }
+   
+    /**
+     * @Test
+     */
+    public function test_export_select_returning_domain() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+    
+        $results = $dao->existsAsDomain(1);
+
+        $this->assertInstanceOf(Existance::class, $results);
+        $this->assertEquals(new Existance(true), $results);
+    
+        $results = $dao->existsAsDomain(999);
+                
+        $this->assertInstanceOf(Existance::class, $results);
+        $this->assertEquals(new Existance(false), $results);
+    }
+    
+    /**
+     * @Test
+    public function test_export_select_returning_entity_array() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+    
+        $results = $dao->listByPub(new \DateTime('2015/4/30'), new \DateTime('2015/5/11'));
+        $this->assertCount(2, $results);
+
+        $row = $results[0];
+        $this->assertInstanceOf(Todo::class, $row);
+        $this->assertEquals(1, $row->id);
+        $this->assertEquals("aaa", $row->todo);
+        $this->assertEquals(new \DateTime("2015/05/01"), $row->created);
+
+        $row = $results[1];
+        $this->assertInstanceOf(Todo::class, $row);
+        $this->assertEquals(2, $row->id);
+        $this->assertEquals("bbb", $row->todo);
+        $this->assertEquals(new \DateTime("2015/05/11"), $row->created);
+    }
+     */
+    
     /**
      * @Test
      */

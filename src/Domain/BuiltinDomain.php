@@ -3,6 +3,7 @@
 namespace Omelet\Domain;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class BuiltinDomain extends DomainBase {
     private $type;
@@ -25,5 +26,16 @@ class BuiltinDomain extends DomainBase {
     
     public static function __set_state($values) {
         return new BuiltinDomain($values['type']);
+    }
+    
+    public function convertResults($results, AbstractPlatform $platform) {
+        if (is_array($results)) {
+            $results = current($results);
+        }
+        if (($results === null) && ($this->type !== Type::STRING)) {
+            $results = 0;
+        }
+        
+        return Type::getType($this->type)->convertToPHPValue($results, $platform);
     }
 }
