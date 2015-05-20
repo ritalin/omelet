@@ -62,12 +62,15 @@ class DaoBuilderContext {
         $classPath = $this->config['daoClassPath'];
         $className = $this->getDaoClassName($intfName);
         
-        $setting = new DaoBuilder($intfName, $className);
+        $setting = new DaoBuilder(new \ReflectionClass($intfName), $className);
         
         $path = "{$classPath}/{$className}.php";
         if (! file_exists(dirname($path))) {
             mkdir(dirname($path), 0777, true);
         }
+        
+        $setting->prepare();
+        
         file_put_contents($path, $setting->export(true));
     }
     
