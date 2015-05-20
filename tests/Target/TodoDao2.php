@@ -76,6 +76,22 @@ interface TodoDao2 {
     function existsAsDomain($id);
     
     /**
+     * @Select
+     * @Returning(type="int[]")
+     *
+     * return int[]
+     */
+    function primaryKeysDesc();
+    
+    /**
+     * @Select
+     * @Returning(type="\Omelet\Tests\Target\PrimaryKey[]")
+     *
+     * return PrimaryKey[]
+     */
+    function primaryKeysDescAsDomain();
+    
+    /**
      * @Insert
      * @ParamAlt(type="\Omelet\Tests\Target\Todo", name="entity")
      *

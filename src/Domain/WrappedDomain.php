@@ -22,11 +22,7 @@ class WrappedDomain extends DomainBase {
         return ($val instanceof CustomDomain) ? $val->expandValues($name, $val, false) : [];
     }
     
-    public static function __set_state($values) {
-        return new WrappedDomain($values['type']);
-    }
-    
-    public function convertResults($results, AbstractPlatform $platform) {
+    protected function convertResultsInternal($results, AbstractPlatform $platform) {
         if (is_array($results)) {
             $results = current($results);
         }
@@ -34,5 +30,9 @@ class WrappedDomain extends DomainBase {
         $class = $this->type;
         
         return new $class($results);
+    }
+    
+    public static function __set_state($values) {
+        return new WrappedDomain($values['type']);
     }
 }

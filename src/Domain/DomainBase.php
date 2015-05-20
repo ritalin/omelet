@@ -8,6 +8,10 @@ abstract class DomainBase {
     protected abstract function expandTypesInternal($name, $val);
     protected abstract function expandValuesInternal($name, $val);
     
+    protected function convertResultsInternal($results, AbstractPlatform $platform) {
+        return null;
+    }
+    
     public function expandTypes($name, $val, $root = true) {
         $types = $this->expandTypesInternal($name, $val);
         
@@ -20,6 +24,10 @@ abstract class DomainBase {
         return $root ? $this->flatten($values) : $values;
     }
     
+    public function convertResults($results, AbstractPlatform $platform) {
+        return $this->convertResultsInternal($results, $platform);
+    }
+    
     private function flatten(array $a) {
         return array_reduce(
             array_keys($a),
@@ -28,9 +36,5 @@ abstract class DomainBase {
             },
             []
         );
-    }
-    
-    public function convertResults($results, AbstractPlatform $platform) {
-        return null;
     }
 }

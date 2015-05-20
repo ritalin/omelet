@@ -24,11 +24,7 @@ class BuiltinDomain extends DomainBase {
         return [$name => $val];
     }
     
-    public static function __set_state($values) {
-        return new BuiltinDomain($values['type']);
-    }
-    
-    public function convertResults($results, AbstractPlatform $platform) {
+    protected function convertResultsInternal($results, AbstractPlatform $platform) {
         if (is_array($results)) {
             $results = current($results);
         }
@@ -37,5 +33,9 @@ class BuiltinDomain extends DomainBase {
         }
         
         return Type::getType($this->type)->convertToPHPValue($results, $platform);
+    }
+    
+    public static function __set_state($values) {
+        return new BuiltinDomain($values['type']);
     }
 }

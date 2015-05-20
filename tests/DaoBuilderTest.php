@@ -395,6 +395,34 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertInstanceOf(Existance::class, $results);
         $this->assertEquals(new Existance(false), $results);
     }
+   
+    /**
+     * @Test
+     */
+    public function test_export_select_returning_primitive_array() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+    
+        $results = $dao->primaryKeysDesc();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals([3, 2, 1], $results);
+    }
+   
+    /**
+     * @Test
+     */
+    public function test_export_select_returning_domain_array() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+    
+        $results = $dao->primaryKeysDescAsDomain();
+
+        $this->assertCount(3, $results);
+        $this->assertEquals([new PrimaryKey(3), new PrimaryKey(2), new PrimaryKey(1)], $results);
+    }
     
     /**
      * @Test

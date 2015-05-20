@@ -43,14 +43,22 @@ class ArrayDomain extends DomainBase {
     public function childDomain() {
         return $this->child;
     }
-    
-    public static function __set_state($values) {
-        return new ArrayDomain($values['child']);
-    }
 
-    public function convertResults($results, AbstractPlatform $platform) {
+    protected function convertResultsInternal($results, AbstractPlatform $platform) {
         if (($this->child instanceof BuiltinDomain) && ($this->child->getType() === Type::STRING)) {
             return $results;
         }
+
+        return array_reduce(
+            array_keys($results),
+            function (array &$tmp, $k) use($results, $platform) { 
+                return $tmp + [$k => $this->child->convertResults($results[$k], $platform)];
+            },
+            []
+        );
+    }
+    
+    public static function __set_state($values) {
+        return new ArrayDomain($values['child']);
     }
 }
