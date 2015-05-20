@@ -2,10 +2,20 @@
 
 namespace Omelet\Domain;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 class ObjectDomain extends DomainBase {
+    /**
+     * @var string
+     */
+    private $type;
+    /** 
+     * @var DomainBase[]
+     */
     private $fields;
     
-    public function __construct(array $fields) {
+    public function __construct($type, array $fields) {
+        $this->type = $type;
         $this->fields = $fields;
     }
     
@@ -30,6 +40,24 @@ class ObjectDomain extends DomainBase {
             }
         );
     }
+
+    protected function convertResultsInternal($results, AbstractPlatform $platform) {
+        if (is_int(key($results))) {
+            $results = current($results);
+        }
+        
+        $class = $this->type;
+        
+        $obj = new $class();
+
+        foreach ($this->fields as $name => $domain) {
+            if (isset($results[$name])) {
+                $obj->{$name} = $domain->convertResults($results[$name], $platform);
+            }
+        }
+        
+        return $obj;
+    }
     
     private function expand($name, $val, callable $fn) {
         return array_reduce(
@@ -43,6 +71,6 @@ class ObjectDomain extends DomainBase {
     }
     
     public static function __set_state($values) {
-        return new ObjectDomain($values['fields']);
+        return new ObjectDomain($values['type'], $values['fields']);
     }
 }

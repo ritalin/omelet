@@ -59,7 +59,7 @@ final class DomainFactory {
             []
         );
         
-        return new ObjectDomain($fields);
+        return new ObjectDomain($ref->name, $fields);
     }
     
     private function isEntity(array $attrs) {
