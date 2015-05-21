@@ -3,9 +3,13 @@
 namespace Omelet\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\PhpParser;
+
 use Doctrine\DBAL\Types\Type;
 
 use Omelet\Annotation\Core\DaoAnnotation;
+use Omelet\Annotation\AnnotationFactory;
+
 use Omelet\Annotation\ParamAlt;
 
 use Omelet\Annotation\Select;
@@ -61,11 +65,16 @@ class DaoBuilder {
     
     public function prepare() {
         $reader = new AnnotationReader();
-    
+
+        $classParser = new PhpParser;
+        $commentParser = new AnnotationFactory(
+            $classParser->parseClass($this->intf) + [$this->intf->getNamespaceName()]
+        );
+
         $this->methods = array_reduce(
             $this->intf->getMethods(),
-            function (array &$tmp, \ReflectionMethod $m) use($reader) {
-                $attrs = $reader->getMethodAnnotations($m);
+            function (array &$tmp, \ReflectionMethod $m) use($reader, $commentParser) {
+                $attrs = $reader->getMethodAnnotations($m) + $commentParser->getMethodAnnotations($m);
 
                 return $tmp + [$m->name => [
                     'name' => $m->name,

@@ -15,6 +15,19 @@ class AnnotationFactory {
         $this->uses = $uses;
     }
     
+    public function getMethodAnnotations(\ReflectionMethod $method) {
+        return $this->getAnnotations(
+            $method->getDocComment(),
+            "method: {$method->getDeclaringClass()->name}::{$method->name}"
+        );
+    }
+    
+    public function getAnnotations($comment, $context) {
+        $annotations = $this->parse($comment, $context);
+
+        return $annotations['params'] + $annotations['returns'] + $annotations['vars'];
+    }
+
     public function parse($comment, $context) {
         $annotations = [
             'params' => [],
