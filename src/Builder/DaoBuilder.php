@@ -74,7 +74,7 @@ class DaoBuilder {
         $this->methods = array_reduce(
             $this->intf->getMethods(),
             function (array &$tmp, \ReflectionMethod $m) use($reader, $commentParser) {
-                $attrs = $reader->getMethodAnnotations($m) + $commentParser->getMethodAnnotations($m);
+                $attrs = array_merge($reader->getMethodAnnotations($m), $commentParser->getMethodAnnotations($m));
 
                 return $tmp + [$m->name => [
                     'name' => $m->name,

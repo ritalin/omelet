@@ -25,7 +25,7 @@ class AnnotationFactory {
     public function getAnnotations($comment, $context) {
         $annotations = $this->parse($comment, $context);
 
-        return $annotations['params'] + $annotations['returns'] + $annotations['vars'];
+        return array_merge($annotations['params'], $annotations['returns'], $annotations['vars']);
     }
 
     public function parse($comment, $context) {
@@ -60,7 +60,7 @@ class AnnotationFactory {
         if (count($annotations['vars']) > 1) {
             throw AnnotationException::semanticalError("Duplicated var: {$context}"); 
         }
-        
+
         return $annotations;
     }
      

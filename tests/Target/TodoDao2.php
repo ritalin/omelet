@@ -11,7 +11,6 @@ use Omelet\Annotation\Returning;
 interface TodoDao2 {
     /**
      * @Select
-     * @ParamAlt(type="\Omelet\Tests\Target\PrimaryKey", name="key")
      *
      * @param PrimaryKey key
      */
@@ -19,7 +18,6 @@ interface TodoDao2 {
     
     /**
      * @Select
-     * @Returning(type="\Omelet\Tests\Target\Todo[]")
      *
      * @return Todo[] 
      */
@@ -27,7 +25,6 @@ interface TodoDao2 {
     
     /**
      * @Select
-     * @Returning(type="string[]")
      *
      * @return array
      */
@@ -35,9 +32,6 @@ interface TodoDao2 {
     
     /**
      * @Select
-     * @ParamAlt(type="\DateTime", name="from")
-     * @ParamAlt(type="\DateTime", name="to")
-     * @Returning(type="\Omelet\Tests\Target\Todo[]")
      *
      * @param DateTime from
      * @param DateTime to
@@ -47,53 +41,44 @@ interface TodoDao2 {
 
     /**
      * @Select
-     * @ParamAlt(type="\Omelet\Tests\Target\PrimaryKey", name="key")
-     * @Returning(type="\Omelet\Tests\Target\Todo")
      *
      * @param PrimaryKey key
-     * return Todo
+     * @return Todo
      */
     function findById(PrimaryKey $key);
     
     /**
      * @Select
-     * @ParamAlt(type="int", name="id")
-     * @Returning(type="bool")
      *
      * @param int key
-     * return bool
+     * @return bool
      */
     function exists($id);
     
     /**
      * @Select
-     * @ParamAlt(type="int", name="id")
-     * @Returning(type="\Omelet\Tests\Target\Existance")
      *
      * @param int key
-     * return Existance
+     * @return Existance
      */
     function existsAsDomain($id);
     
     /**
      * @Select
-     * @Returning(type="int[]")
      *
-     * return int[]
+     * @return int[]
      */
     function primaryKeysDesc();
     
     /**
      * @Select
-     * @Returning(type="\Omelet\Tests\Target\PrimaryKey[]")
      *
-     * return PrimaryKey[]
+     * @return PrimaryKey[]
      */
     function primaryKeysDescAsDomain();
     
     /**
      * @Insert
-     * @ParamAlt(type="\Omelet\Tests\Target\Todo", name="entity")
      *
      * @param Todo entity
      */

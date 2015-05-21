@@ -20,7 +20,7 @@ use Omelet\Tests\Target\Todo;
 
 class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @Test
+     * @test
      */
      public function test_build_prepare() {
         $context = new DaoBuilderContext();
