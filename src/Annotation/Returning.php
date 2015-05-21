@@ -18,4 +18,11 @@ final class Returning implements DaoAnnotation {
      * @var string
      */
     public $type;
+    
+    public static function __set_state($values) {
+        $a = new Returning();
+        $a->type = $values['type'];
+        
+        return $a;
+    }
 }
