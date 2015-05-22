@@ -42,9 +42,7 @@ final class DomainFactory {
             $ref = new \ReflectionClass($type);
             $attrs = $reader->getClassAnnotations($ref);
             
-            if ($this->isEntity($attrs)) {
-                return self::parseAsEntity($name, $ref, $reader);
-            }
+            return self::parseAsEntity($name, $ref, $reader);
         }
         
         throw new \Exception("domain not found: ($type $name)");

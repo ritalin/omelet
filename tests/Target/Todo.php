@@ -5,9 +5,6 @@ namespace Omelet\Tests\Target;
 use Omelet\Annotation\Entity;
 use Omelet\Annotation\Column;
 
-/**
- * @Entity
- */
 class Todo {
     /**
      * @var integer
