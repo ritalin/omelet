@@ -2,7 +2,7 @@
 
 namespace OmeletTests;
 
-use Omelet\Annotation\AnnotationFactory;
+use Omelet\Annotation\AnnotationConverter;
 use Omelet\Annotation\Returning;
 use Omelet\Annotation\ParamAlt;
 use Omelet\Annotation\Column;
@@ -30,7 +30,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(0, $annotations['params']);
@@ -55,7 +55,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(0, $annotations['params']);
@@ -82,7 +82,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(0, $annotations['params']);
@@ -112,7 +112,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(0, $annotations['params']);
@@ -166,7 +166,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(0, $annotations['params']);
@@ -196,7 +196,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(0, $annotations['params']);
@@ -226,7 +226,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(0, $annotations['params']);
@@ -257,7 +257,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         try {
             $factory->parse($comment, '');
             
@@ -292,7 +292,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         
         try {
             $factory->parse($comment, '');
@@ -329,7 +329,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(2, $annotations['params']);
@@ -363,7 +363,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['params']);
@@ -394,7 +394,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(2, $annotations['params']);
@@ -429,7 +429,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(2, $annotations['params']);
@@ -464,7 +464,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['params']);
@@ -495,7 +495,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
@@ -524,7 +524,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
@@ -553,7 +553,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
@@ -582,7 +582,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             __NAMESPACE__,
             
         ];
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
@@ -613,7 +613,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
             
         ];
 
-        $factory = new AnnotationFactory($uses);
+        $factory = new AnnotationConverter($uses);
         try {
             $factory->parse($comment, '');
             

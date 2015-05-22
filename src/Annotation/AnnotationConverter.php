@@ -5,7 +5,7 @@ namespace Omelet\Annotation;
 use Doctrine\Common\Annotations\DocLexer;
 use Doctrine\Common\Annotations\AnnotationException;
 
-class AnnotationFactory {
+class AnnotationConverter {
     /**
      * var string[]
      */

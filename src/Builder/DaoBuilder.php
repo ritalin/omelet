@@ -8,7 +8,7 @@ use Doctrine\Common\Annotations\PhpParser;
 use Doctrine\DBAL\Types\Type;
 
 use Omelet\Annotation\Core\DaoAnnotation;
-use Omelet\Annotation\AnnotationFactory;
+use Omelet\Annotation\AnnotationConverter;
 
 use Omelet\Annotation\ParamAlt;
 
@@ -67,7 +67,7 @@ class DaoBuilder {
         $reader = new AnnotationReader();
 
         $classParser = new PhpParser;
-        $commentParser = new AnnotationFactory(
+        $commentParser = new AnnotationConverter(
             $classParser->parseClass($this->intf) + [$this->intf->getNamespaceName()]
         );
 
