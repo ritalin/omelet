@@ -13,7 +13,7 @@ use Omelet\Annotation\Core\DaoAnnotation;
  * @Annotation
  * @Target("PROPERTY")
  */
-final class Column {
+final class Column implements Core\EntityFieldAnnotation {
     public $type;
     public $name;
     

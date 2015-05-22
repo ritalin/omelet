@@ -33,12 +33,26 @@ class AnnotationConverterAdapter {
     /**
      * Collect method annotations
      *
-     * @param string methodName
+     * @param ReflectionMethod methodName
+     * @return DaoAnnotation[]
      */
     public function getMethodAnnotations(\ReflectionMethod $method) {
         return array_merge(
             $this->reader->getMethodAnnotations($method),
             $this->converter->getMethodAnnotations($method)
+        );
+    }
+    
+    /**
+     * Collect property annotations
+     *
+     * @param ReflectionProperty methodName
+     * @return EntityFieldAnnotation[]
+     */
+    public function getPropertyAnnotations(\ReflectionProperty $prop) {
+        return array_merge(
+            $this->reader->getPropertyAnnotations($prop),
+            $this->converter->getPropertyAnnotations($prop)
         );
     }
 }

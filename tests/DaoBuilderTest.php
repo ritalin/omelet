@@ -313,7 +313,6 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $context = new DaoBuilderContext();
         $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
         
-        $reader = new AnnotationReader();
         $factory = new DomainFactory();
         
         $builder->prepare();
@@ -329,7 +328,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         listAll: {
             $info = $methods['listAll'];
-            $actial = $factory->parse('', Todo::class, $reader);
+            $actial = $factory->parse('', Todo::class);
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
@@ -338,7 +337,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         listAllAsRawArray: {
             $info = $methods['listAllAsRawArray'];
-            $actial = $factory->parse('', Todo::class, $reader);
+            $actial = $factory->parse('', Todo::class);
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
@@ -347,7 +346,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         listByPub: {
             $info = $methods['listByPub'];
-            $actial = $factory->parse('', Todo::class, $reader);
+            $actial = $factory->parse('', Todo::class);
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
@@ -356,7 +355,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         findById: {
             $info = $methods['findById'];
-            $actial = $factory->parse('', Todo::class, $reader);
+            $actial = $factory->parse('', Todo::class);
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']);

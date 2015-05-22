@@ -8,25 +8,21 @@ use Omelet\Annotation\Column;
 class Todo {
     /**
      * @var integer
-     * @Column(type="integer", name="id")
      */
     public $id;
     
     /**
      * @var string
-     * @Column(type="string", name="todo")
      */
     public $todo;
     
     /**
      * @var \DateTime
-     * @Column(type=\DateTime::class, name="created")
      */
     public $created;
     
     /**
      * @var Hidden
-     * @Column(type=Hidden::class, name="hidden")
      */
     public $hidden;
     

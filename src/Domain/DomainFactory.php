@@ -5,6 +5,7 @@ namespace Omelet\Domain;
 use Doctrine\DBAL\Types;
 use Doctrine\Common\Annotations\AnnotationReader;
 
+use Omelet\Annotation\AnnotationConverterAdapter;
 use Omelet\Annotation\Entity;
 use Omelet\Annotation\Column;
 
@@ -17,13 +18,13 @@ final class DomainFactory {
         'DateTime' => Types\Type::DATETIME,
     ];
 
-    public function parse($name, $type, AnnotationReader $reader) {
+    public function parse($name, $type) {
         if (isset(self::$alias[$type])) {
             $type = self::$alias[$type];
         }
         
         if (($p = strrpos($type, '[]')) !== false) {
-            return new ArrayDomain($this->parse('', substr($type, 0, $p), $reader));
+            return new ArrayDomain($this->parse('', substr($type, 0, $p)));
         }
         
         if ($type === Types\Type::TARRAY) {
@@ -39,20 +40,19 @@ final class DomainFactory {
         }
         
         if (class_exists($type)) {
-            $ref = new \ReflectionClass($type);
-            $attrs = $reader->getClassAnnotations($ref);
-            
-            return self::parseAsEntity($name, $ref, $reader);
+            return self::parseAsEntity($name, new \ReflectionClass($type));
         }
         
         throw new \Exception("domain not found: ($type $name)");
     }
     
-    public function parseAsEntity($name, \ReflectionClass $ref, AnnotationReader $reader) {
+    public function parseAsEntity($name, \ReflectionClass $ref) {
+        $reader = new AnnotationConverterAdapter($ref);
+        
         $fields = array_reduce(
             $ref->getProperties(),
             function (array &$tmp, \ReflectionProperty $f) use($reader) {
-                return $tmp + [$f->name => $this->parse($f->name, $this->fieldType($f, $reader), $reader)];
+                return $tmp + [$f->name => $this->parse($f->name, $this->fieldType($f, $reader))];
             },
             []
         );
@@ -71,7 +71,7 @@ final class DomainFactory {
         return count($tmp) > 0;
     }
     
-    private function fieldType(\ReflectionProperty $field, AnnotationReader $reader) {
+    private function fieldType(\ReflectionProperty $field, AnnotationConverterAdapter $reader) {
         $tmp = array_filter(
             $reader->getPropertyAnnotations($field),
             function ($a) {

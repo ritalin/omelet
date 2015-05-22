@@ -16,16 +16,36 @@ class AnnotationConverter {
     }
     
     public function getMethodAnnotations(\ReflectionMethod $method) {
-        return $this->getAnnotations(
+        $annotations = $this->getAnnotations(
             $method->getDocComment(),
             "method: {$method->getDeclaringClass()->name}::{$method->name}"
+        );
+        
+        return array_merge($annotations['params'], $annotations['returns'], $annotations['vars']);
+    }
+    
+    public function getPropertyAnnotations(\ReflectionProperty $prop) {
+        $annotations = $this->getAnnotations(
+            $prop->getDocComment(),
+            "property: {$prop->getDeclaringClass()->name}::{$prop->name}"
+        );
+        
+        $varAnnotations = $annotations['vars'];
+        
+        return array_reduce(
+            array_keys($varAnnotations),
+            function (array &$tmp, $i) use($prop, $varAnnotations) {
+                $a = $varAnnotations[$i];
+                $a->name = $prop->name;
+                
+                return $tmp + [$i => $a];
+            },
+            []
         );
     }
     
     public function getAnnotations($comment, $context) {
-        $annotations = $this->parse($comment, $context);
-
-        return array_merge($annotations['params'], $annotations['returns'], $annotations['vars']);
+        return $this->parse($comment, $context);
     }
 
     public function parse($comment, $context) {
@@ -112,7 +132,9 @@ class AnnotationConverter {
      
      private function parseReturnComment(DocLexer $lexer, $context) {
         if ($ids = $this->parseDocComment($lexer, 'return', 1)) {
-            return Returning::__set_state(['type' => $this->complementType($ids[0], $context)]);
+            $t = trim($this->complementType($ids[0], $context), "\\");
+            
+            return Returning::__set_state(['type' => $t]);
         }
         else {
             return false;
@@ -121,7 +143,9 @@ class AnnotationConverter {
      
      private function parseParamComment(DocLexer $lexer, $context) {
         if ($ids = $this->parseDocComment($lexer, 'param', 2)) {
-            return ParamAlt::__set_state(['type' => $this->complementType($ids[0], $context), 'name' => $ids[1]]);
+            $t = trim($this->complementType($ids[0], $context), "\\");
+            
+            return ParamAlt::__set_state(['type' => $t, 'name' => $ids[1]]);
         }
         else {
             return false;
@@ -130,7 +154,9 @@ class AnnotationConverter {
      
      private function parseVarComment(DocLexer $lexer, $context) {
         if ($ids = $this->parseDocComment($lexer, 'var', 1)) {
-            return Column::__set_state(['type' => $this->complementType($ids[0], $context), 'name' => '']);
+            $t = trim($this->complementType($ids[0], $context), "\\");
+            
+            return Column::__set_state(['type' => $t, 'name' => '']);
         }
         else {
             return false;
