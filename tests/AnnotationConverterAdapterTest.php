@@ -23,7 +23,7 @@ class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
 
         $commentParser = new AnnotationConverterAdapter($intf);
 
-        $annotations = $commentParser->getMethodAnnotations('listByPub');
+        $annotations = $commentParser->getMethodAnnotations($intf->getMethod('listByPub'));
         
         $this->assertCount(4, $annotations);
         $this->assertInstanceOf(Select::class, $annotations[0]);

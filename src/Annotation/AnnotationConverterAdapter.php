@@ -35,9 +35,7 @@ class AnnotationConverterAdapter {
      *
      * @param string methodName
      */
-    public function getMethodAnnotations($methodName) {
-        $method = $this->intf->getMethod($methodName);
-        
+    public function getMethodAnnotations(\ReflectionMethod $method) {
         return array_merge(
             $this->reader->getMethodAnnotations($method),
             $this->converter->getMethodAnnotations($method)
