@@ -22,7 +22,7 @@ class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-     public function test_parse_method_annotation() {
+    public function test_parse_method_annotation() {
         $intf = new \ReflectionClass(TodoDao2::class);
 
         $commentParser = new AnnotationConverterAdapter($intf);

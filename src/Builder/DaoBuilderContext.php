@@ -4,13 +4,16 @@ namespace Omelet\Builder;
 
 use Composer\Autoload\ClassLoader;
 
+use Omelet\Watch\WatchMode;
+
 class DaoBuilderContext {
     public static function defaultConfig() {
         static $config = [
             'daoClassPath' => '_auto_generated',
             'sqlRootDir' => 'sql',
             'pdoDsn' => [],
-            'daoClassSuffix' => 'Impl'
+            'daoClassSuffix' => 'Impl',
+            'watchMode' => WatchMode::Always
         ];
         
         return $config;
