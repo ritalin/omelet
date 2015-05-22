@@ -12,6 +12,7 @@ use Omelet\Annotation\AnnotationConverterAdapter;
 
 use Omelet\Annotation\ParamAlt;
 
+use Omelet\Annotation\Dao;
 use Omelet\Annotation\Select;
 use Omelet\Annotation\Returning;
 
@@ -27,8 +28,13 @@ class DaoBuilder {
      * @var string 
      */
     private $className;
+    
     private $methods = [];
     
+    /**
+     * @var string[]
+     */
+    private $config = [];
     /**
      * @var DomainFactory
      */
@@ -52,6 +58,10 @@ class DaoBuilder {
         return $this->methods;
     }
     
+    public function getConfig() {
+        return $this->config;
+    }
+    
     private function extractAnnotation(array $attrs, $class) {
         $results = array_filter(
             $attrs,
@@ -67,7 +77,9 @@ class DaoBuilder {
         $reader = new AnnotationReader();
 
         $commentParser = new AnnotationConverterAdapter($this->intf);
-
+        
+        $this->config = $this->extractDaoClassConfig($commentParser->getClassAnnotations());
+        
         $this->methods = array_reduce(
             $this->intf->getMethods(),
             function (array &$tmp, \ReflectionMethod $m) use($reader, $commentParser) {
@@ -83,6 +95,18 @@ class DaoBuilder {
             },
             []
         );
+    }
+    
+    private function extractDaoClassConfig(array $annotations) {
+        $config = [];
+        
+        $a = $this->extractAnnotation($annotations, Dao::class);
+        if (isset($a)) {
+            foreach ($a as $field => $value) {
+                $config[$field] = $value;
+            }
+        }
+        return $config;
     }
     
     private function paramToDomain(array $params, array $attrs, AnnotationReader $reader) {
@@ -162,6 +186,12 @@ class DaoBuilder {
         $ns = substr($className, 0, $p);
         $name = substr($className, $p+1);
         
+        $accessRoute = array_merge(
+            preg_split('/[\/\\\\]/', ($this->config['route'] !== '') ? $this->config['route'] : $ns), 
+            [$this->intf->getShortName()]
+        );
+        $accessRoute = implode(DIRECTORY_SEPARATOR, $accessRoute);
+        
         if ($ns !== '') {
             $ns = "namespace {$ns};";
         }
@@ -179,6 +209,8 @@ use Omelet\Builder\DaoBuilderContext;
 use Doctrine\DBAL\Driver\Connection;
 
 class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
+    const AccessRoute = '{$accessRoute}';
+    
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
         parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'));
     }

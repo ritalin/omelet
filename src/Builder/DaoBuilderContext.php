@@ -23,7 +23,6 @@ class DaoBuilderContext {
         
         $loader = new ClassLoader();
         $loader->addPsr4('', $this->config['daoClassPath']);
-        // AnnotationRegistry::registerLoader([$loader, 'loadClass']);
         $loader->register();
     }
     
@@ -44,8 +43,11 @@ class DaoBuilderContext {
     }
 
     public function queriesOf($intfName) {
-        $rootDir = $this->normalizePath($this->config['sqlRootDir'] . $intfName);
-        
+        $className = $this->getDaoClassName($intfName);
+        $accessRoute = $className::AccessRoute;
+
+        $rootDir = $this->normalizePath("{$this->config['sqlRootDir']}/{$accessRoute}");
+
         $t = new \ReflectionClass($intfName);
         
         return array_reduce(

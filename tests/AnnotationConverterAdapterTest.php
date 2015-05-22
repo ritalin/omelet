@@ -4,6 +4,7 @@ namespace OmeletTests;
 
 use Omelet\Annotation\AnnotationConverterAdapter;
 
+use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
 use Omelet\Tests\Target\Todo;
 use Omelet\Tests\Target\Hidden;
@@ -11,6 +12,7 @@ use Omelet\Tests\Target\Hidden;
 use Omelet\Builder\DaoBuilderContext;
 use Omelet\Builder\DaoBuilder;
 
+use Omelet\Annotation\Dao;
 use Omelet\Annotation\Select;
 use Omelet\Annotation\ParamAlt;
 use Omelet\Annotation\Returning;
@@ -75,4 +77,28 @@ class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals('hidden', $annotations[0]->name);
         }
     }
+     
+    /**
+     * @test
+     */
+     public function test_parse_class_annotation() {
+        TodoDao: {
+            $intf = new \ReflectionClass(TodoDao::class);
+            
+            $commentParser = new AnnotationConverterAdapter($intf);
+            $annotations = $commentParser->getClassAnnotations();
+            $this->assertCount(1, $annotations);
+            $this->assertInstanceOf(Dao::class, $annotations[0]);
+            $this->assertEquals('', $annotations[0]->route);
+        }
+        TodoDao2: {
+            $intf = new \ReflectionClass(TodoDao2::class);
+            
+            $commentParser = new AnnotationConverterAdapter($intf);
+            $annotations = $commentParser->getClassAnnotations();
+            $this->assertCount(1, $annotations);
+            $this->assertInstanceOf(Dao::class, $annotations[0]);
+            $this->assertEquals('/', $annotations[0]->route);
+        }
+     }
 }

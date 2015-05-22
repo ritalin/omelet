@@ -490,4 +490,23 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($entity->todo, $row['todo']);
         $this->assertEquals($entity->created, new \DateTime($row['created']));
     }
+    
+    /**
+     * @Test
+     */
+    public function test_prepare_dao_clss_nnottion() {
+        $context = new DaoBuilderContext();
+        $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
+        
+        $factory = new DomainFactory();
+        
+        $config = $builder->getConfig();
+        $this->assertCount(0, $config);
+        
+        $builder->prepare();
+        $config = $builder->getConfig();
+        
+        $this->assertCount(1, $config);
+        $this->assertEquals("/", $config['route']);
+    }
 }

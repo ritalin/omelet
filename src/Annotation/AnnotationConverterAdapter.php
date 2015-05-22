@@ -55,4 +55,8 @@ class AnnotationConverterAdapter {
             $this->converter->getPropertyAnnotations($prop)
         );
     }
+    
+    public function getClassAnnotations() {
+        return $this->reader->getClassAnnotations($this->intf);
+    }
 }

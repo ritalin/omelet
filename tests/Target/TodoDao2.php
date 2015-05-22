@@ -5,9 +5,13 @@ namespace Omelet\Tests\Target;
 use Omelet\Annotation\Select;
 use Omelet\Annotation\Insert;
 
+use Omelet\Annotation\Dao;
 use Omelet\Annotation\ParamAlt;
 use Omelet\Annotation\Returning;
 
+/**
+ * @Dao(route="/")
+ */
 interface TodoDao2 {
     /**
      * @Select
