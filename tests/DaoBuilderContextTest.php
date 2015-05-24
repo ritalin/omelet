@@ -4,6 +4,7 @@ namespace OmeletTests;
 
 use Omelet\Builder\DaoBuilderContext;
 use Omelet\Tests\Target\TodoDao;
+use Omelet\Watch\WatchMode;
 
 class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -16,7 +17,8 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
             'daoClassPath' => '_auto_generated',
             'sqlRootDir' => 'sql',
             'pdoDsn' => [],
-            'daoClassSuffix' => 'Impl'
+            'daoClassSuffix' => 'Impl',
+            'watchMode' => WatchMode::Whenever(),
         ];
         
         $this->assertEquals($expects, $context->getConfig());
@@ -26,13 +28,14 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
      public function test_config() {
-        $context = new DaoBuilderContext(['sqlRootDir' => 'queries']);
+        $context = new DaoBuilderContext(['sqlRootDir' => 'queries', 'watchMode' => WatchMode::Once()]);
      
         $expects = [
             'daoClassPath' => '_auto_generated',
             'sqlRootDir' => 'queries',
             'pdoDsn' => [],
-            'daoClassSuffix' => 'Impl'
+            'daoClassSuffix' => 'Impl',
+            'watchMode' => WatchMode::Once(),
         ];
         
         $this->assertEquals($expects, $context->getConfig());

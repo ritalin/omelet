@@ -8,15 +8,13 @@ use Omelet\Watch\WatchMode;
 
 class DaoBuilderContext {
     public static function defaultConfig() {
-        static $config = [
+        return [
             'daoClassPath' => '_auto_generated',
             'sqlRootDir' => 'sql',
             'pdoDsn' => [],
             'daoClassSuffix' => 'Impl',
-            'watchMode' => WatchMode::Always
+            'watchMode' => WatchMode::Whenever(),
         ];
-        
-        return $config;
     }
     
     private $config;

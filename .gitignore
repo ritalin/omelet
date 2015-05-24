@@ -3,3 +3,4 @@ tests/fixtures/.DS_Store
 tests/fixtures/exports/
 tests/fixtures/todo.sqlite3
 vendor/
+tests/fixtures/sql/SwitchDao/*.sql

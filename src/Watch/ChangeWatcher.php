@@ -41,19 +41,6 @@ class ChangeWatcher {
         
     }
     
-    public function __destruct() {
-        if ($this->historyModified()) {
-            $path = $this->getHistoryPath();
-            $dir = basename($path);
-            
-            if (! file_exists($dir)) {
-                @mkdir($dir, 0777, true);
-            }
-            
-            file_put_contents($path, json_encode($this->newHistories));
-        }
-    }
-    
     public function historyModified() {
         $d1 = count(array_diff_assoc($this->oldHistories, $this->newHistories));
         $d2 = count(array_diff_assoc($this->newHistories, $this->oldHistories));
@@ -61,16 +48,13 @@ class ChangeWatcher {
         return ($d1 !== 0) || ($d2 !== 0);
     }
     
-    public function sqlOutdated($fqcn) {
-        if (! class_exists($fqcn)) return true;
-        
-        $route = $fqcn::AccessRoute;
-        
+    public function sqlOutdated($route) {
+        $results = [];
         foreach (glob("{$route}/*.sql", GLOB_NOSORT) as $path) {
-            if ($this->outdated($path)) return true;
+            $results[] = $this->outdated($path);
         }
         
-        return false;
+        return in_array(true, $results);
     }
     
     public function outdated($path) {
@@ -83,12 +67,39 @@ class ChangeWatcher {
                 return false;
             }
         }
-
-        $hash = $this->newHistories[$path] = (string)md5_file($path);
+        $this->newHistories[$path] = $hash = md5_file($path);
         
         return isset($this->oldHistories[$path]) ? ($this->oldHistories[$path] !== $hash) : true;
     }
     
+    public function clear() {
+        $this->clearHistory($this->getHistoryPath());
+            
+        $this->oldHistories = $this->newHistories = [];
+    }
+
+    private function clearHistory($file) {
+        if (file_exists($file)) {
+            unlink($file);
+        }
+    }
+
+    public function save($permanently = true) {
+        if ($this->historyModified()) {
+            if ($permanently) {
+                $path = $this->getHistoryPath();
+                $dir = basename($path);
+                
+                if (! file_exists($dir)) {
+                    @mkdir($dir, 0777, true);
+                }
+                
+                file_put_contents($path, json_encode($this->newHistories));
+            }
+            $this->oldHistories = $this->newHistories;
+        }
+    }
+
     public function getHistoryPath() {
         $f = self::$fileName;
         
