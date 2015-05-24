@@ -4,6 +4,7 @@ namespace Omelet\Builder;
 
 use Composer\Autoload\ClassLoader;
 
+use Omelet\Watch\ChangeWatcher;
 use Omelet\Watch\WatchMode;
 
 class DaoBuilderContext {
@@ -17,11 +18,20 @@ class DaoBuilderContext {
         ];
     }
     
+    /** 
+     * @var array
+     */
     private $config;
     
+    /**
+     * @var ChangeWatcher
+     */
+    private $watcher;
+
     public function __construct(array $config = []) {
         $this->config = array_merge(self::defaultConfig(), $config);
-        
+        $this->watcher = new ChangeWatcher($this->config['daoClassPath'], $this->config['watchMode']);
+
         $loader = new ClassLoader();
         $loader->addPsr4('', $this->config['daoClassPath']);
         $loader->register();
@@ -74,10 +84,13 @@ class DaoBuilderContext {
             mkdir(dirname($path), 0777, true);
         }
         
-        $setting = new DaoBuilder(new \ReflectionClass($intfName), $className);
-        $setting->prepare();
-        
-        file_put_contents($path, $setting->export(true));
+        $ref = new \ReflectionClass($intfName);
+        if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->outdated($className::AccessRoute)) {
+            $builder = new DaoBuilder($ref, $className);
+            $builder->prepare();
+            
+            file_put_contents($path, $builder->export(true));
+        }
     }
     
     public function getConfig() {

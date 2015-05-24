@@ -40,15 +40,22 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
     
     private function modifyDao() {    
         $daoFile = __DIR__ . '/Target/SwitchDao';
-        if (file_exists("{$daoFile}_1a.php")) {
-            copy("{$daoFile}_2.php", "{$daoFile}.php");
-            rename("{$daoFile}_1a.php", "{$daoFile}_1.php");
-            rename("{$daoFile}_2.php", "{$daoFile}_2a.php");
+        $lockFile = self::daoRoot . '/lockDao';
+        if (file_exists("{$lockFile}_1")) {
+            $from = 1;
+            $to = 2;
         }
         else {
-            copy("{$daoFile}_1.php", "{$daoFile}.php");
-            rename("{$daoFile}_1.php", "{$daoFile}_1a.php");
-            rename("{$daoFile}_2a.php", "{$daoFile}_2.php");
+            $from = 2;
+            $to = 1;
+        }
+        copy("{$daoFile}_{$to}.php", "{$daoFile}.php");
+
+        if (file_exists("{$lockFile}_{$from}")) {
+            rename("{$lockFile}_{$from}", "{$lockFile}_{$to}");
+        }
+        else {
+            touch("{$lockFile}_{$to}");
         }
     }
     
