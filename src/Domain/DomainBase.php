@@ -6,11 +6,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 abstract class DomainBase {
     protected abstract function expandTypesInternal($name, $val);
-    protected abstract function expandValuesInternal($name, $val);
-    
-    protected function convertResultsInternal($results, AbstractPlatform $platform) {
-        return null;
-    }
+    protected abstract function expandValuesInternal($name, $val);    
+    protected abstract function convertResultsInternal($results, AbstractPlatform $platform);
     
     public function expandTypes($name, $val, $root = true) {
         $types = $this->expandTypesInternal($name, $val);

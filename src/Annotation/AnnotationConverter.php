@@ -156,7 +156,7 @@ class AnnotationConverter {
         if ($ids = $this->parseDocComment($lexer, 'var', 1)) {
             $t = trim($this->complementType($ids[0], $context), "\\");
             
-            return Column::__set_state(['type' => $t, 'name' => '']);
+            return ColumnType::__set_state(['type' => $t, 'name' => '']);
         }
         else {
             return false;

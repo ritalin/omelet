@@ -24,4 +24,8 @@ abstract class CustomDomain extends DomainBase {
     protected function expandValuesInternal($name, $val) {
         return [$name => $this->value];
     }
+
+    protected function convertResultsInternal($results, AbstractPlatform $platform) {
+        return $results
+    }
 }

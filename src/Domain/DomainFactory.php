@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 
 use Omelet\Annotation\AnnotationConverterAdapter;
 use Omelet\Annotation\Entity;
+use Omelet\Annotation\ColumnType;
 use Omelet\Annotation\Column;
 
 final class DomainFactory {
@@ -40,19 +41,27 @@ final class DomainFactory {
         }
         
         if (class_exists($type)) {
-            return self::parseAsEntity($name, new \ReflectionClass($type));
+            return self::parseAsEntity(new \ReflectionClass($type));
         }
         
         throw new \Exception("domain not found: ($type $name)");
     }
     
-    public function parseAsEntity($name, \ReflectionClass $ref) {
+    public function parseAsEntity(\ReflectionClass $ref) {
         $reader = new AnnotationConverterAdapter($ref);
         
         $fields = array_reduce(
             $ref->getProperties(),
             function (array &$tmp, \ReflectionProperty $f) use($reader) {
-                return $tmp + [$f->name => $this->parse($f->name, $this->fieldType($f, $reader))];
+                $annotations = $reader->getPropertyAnnotations($f);
+                $domain = $this->parse($f->name, $this->extractAnnotation($annotations, ColumnType::class));
+
+                if (($name = $this->extractAnnotation($annotations, Colimn::class)) !== null) {
+                    return $tmp + array_fill_keys([$f->name, name], $domain);
+                }
+                else {
+                    return $tmp + [$f->name => $domain];
+                }
             },
             []
         );
@@ -71,11 +80,11 @@ final class DomainFactory {
         return count($tmp) > 0;
     }
     
-    private function fieldType(\ReflectionProperty $field, AnnotationConverterAdapter $reader) {
+    private function extractAnnotation(array $annotations, $class) {
         $tmp = array_filter(
-            $reader->getPropertyAnnotations($field),
+            $annotations,
             function ($a) {
-                return $a instanceof Column;
+                return $a instanceof $class;
             }
         );
         

@@ -10,7 +10,7 @@ class ObjectDomain extends DomainBase {
      */
     private $type;
     /** 
-     * @var DomainBase[]
+     * @var NamedDomain[]
      */
     private $fields;
     
@@ -41,7 +41,7 @@ class ObjectDomain extends DomainBase {
         );
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform) {
+    protected function convertResultsInternal($name, $results, AbstractPlatform $platform) {
         if (is_int(key($results))) {
             $results = current($results);
         }
@@ -50,10 +50,9 @@ class ObjectDomain extends DomainBase {
         
         $obj = new $class();
 
-        foreach ($this->fields as $name => $domain) {
-            if (isset($results[$name])) {
-                $obj->{$name} = $domain->convertResults($results[$name], $platform);
-            }
+        foreach ($this->fields as $n => $domain) {
+            $newName = empty($name) ? $n : "$name_$n";
+            $obj->{$name} = $domain->convertResults($newName, $results, $platform);
         }
         
         return $obj;

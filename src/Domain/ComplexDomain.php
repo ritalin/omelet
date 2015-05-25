@@ -2,6 +2,8 @@
 
 namespace Omelet\Domain;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 class ComplexDomain extends DomainBase {
     private $domains;
     private $boundOneArray = false;
@@ -40,6 +42,10 @@ class ComplexDomain extends DomainBase {
             },
             []
         );
+    }
+
+    protected function convertResultsInternal($results, AbstractPlatform $platform) {
+        return $results;
     }
     
     public static function __set_state($values) {
