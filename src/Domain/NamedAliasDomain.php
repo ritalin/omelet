@@ -13,16 +13,21 @@ class NamedAliasDomain extends DomainBase {
 	 * @var string
 	 */
 	private $alias;
+    /**
+     * @var mixed
+     */
+    private $default;
 
 	/**
 	 * @var DomainBase
 	 */
 	private $domain;
 
-	public function __construct(DomainBase $domain, $name, $alias = null) {
+	public function __construct(DomainBase $domain, $name, $alias, $default) {
         $this->domain = $domain;
         $this->name = $name;
         $this->alias = $alias;
+        $this->default = $default;
 	}
 	
 	public function getDomain() {
@@ -45,11 +50,11 @@ class NamedAliasDomain extends DomainBase {
             return $this->domain->convertResults($results[$this->name], $platform);
         }
         else {
-            return null;
+            return $this->default !== null ? $this->domain->convertResults($this->default, $platform) : null;
         }
     }
     
     public static function __set_state($values) {
-        return new self($values['domain'], $values['name'], $values['alias']);
+        return new self($values['domain'], $values['name'], $values['alias'], $values['default']);
     }
 }

@@ -24,6 +24,8 @@ class Todo {
     public $created;
     
     /**
+     * @Column(default="0")
+     *
      * @var Hidden
      */
     public $hidden;

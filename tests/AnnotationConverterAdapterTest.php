@@ -17,6 +17,7 @@ use Omelet\Annotation\Select;
 use Omelet\Annotation\ParamAlt;
 use Omelet\Annotation\Returning;
 use Omelet\Annotation\ColumnType;
+use Omelet\Annotation\Column;
 
 class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -56,6 +57,9 @@ class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
             $annotations = $commentParser->getPropertyAnnotations($intf->getProperty('id'));
             
             $this->assertCount(2, $annotations);
+            $this->assertInstanceOf(Column::class, $annotations[0]);
+            $this->assertEquals('todo_id', $annotations[0]->alias);
+            $this->assertNull($annotations[0]->default);
             $this->assertInstanceOf(ColumnType::class, $annotations[1]);
             $this->assertEquals('integer', $annotations[1]->type);
             $this->assertEquals('id', $annotations[1]->name);
@@ -71,10 +75,13 @@ class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
         hidden: {
             $annotations = $commentParser->getPropertyAnnotations($intf->getProperty('hidden'));
             
-            $this->assertCount(1, $annotations);
-            $this->assertInstanceOf(ColumnType::class, $annotations[0]);
-            $this->assertEquals(Hidden::class, $annotations[0]->type);
-            $this->assertEquals('hidden', $annotations[0]->name);
+            $this->assertCount(2, $annotations);
+            $this->assertInstanceOf(Column::class, $annotations[0]);
+            $this->assertNull(null, $annotations[0]->alias);
+            $this->assertEquals(0, $annotations[0]->default);
+            $this->assertInstanceOf(ColumnType::class, $annotations[1]);
+            $this->assertEquals(Hidden::class, $annotations[1]->type);
+            $this->assertEquals('hidden', $annotations[1]->name);
         }
     }
      

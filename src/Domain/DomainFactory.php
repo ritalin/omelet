@@ -59,10 +59,12 @@ final class DomainFactory {
                 $annotations = $reader->getPropertyAnnotations($f);
                 
                 $columnType = $this->extractAnnotation($annotations, ColumnType::class, function ($a) { return $a->type; } );                
-                $alias = $this->extractAnnotation($annotations, Column::class, function ($a) { return $a->alias; });
+                list($alias, $default) = $this->extractAnnotation(
+                    $annotations, Column::class, function ($a) { return [ $a->alias, $a->default ]; }
+                );
                 $domain = $this->parse($f->name, $columnType);
                 
-                return $tmp + [$f->name => new NamedAliasDomain($domain, $f->name, $alias)];
+                return $tmp + [$f->name => new NamedAliasDomain($domain, $f->name, $alias, $default)];
             },
             []
         );
