@@ -5,7 +5,7 @@ namespace OmeletTests;
 use Omelet\Annotation\AnnotationConverter;
 use Omelet\Annotation\Returning;
 use Omelet\Annotation\ParamAlt;
-use Omelet\Annotation\Column;
+use Omelet\Annotation\ColumnType;
 
 use Omelet\Annotation\Entity;
 use Omelet\Annotation\Select;
@@ -499,7 +499,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
-        $this->assertInstanceOf(Column::class, $annotations['vars'][0]);
+        $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals('bool', $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);
@@ -528,7 +528,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
-        $this->assertInstanceOf(Column::class, $annotations['vars'][0]);
+        $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals('float[]', $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);
@@ -557,7 +557,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
-        $this->assertInstanceOf(Column::class, $annotations['vars'][0]);
+        $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals(\DateInterval::class, $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);
@@ -586,7 +586,7 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $annotations = $factory->parse($comment, '');
         
         $this->assertCount(1, $annotations['vars']);
-        $this->assertInstanceOf(Column::class, $annotations['vars'][0]);
+        $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals(Update::class . '[]', $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);

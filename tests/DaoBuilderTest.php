@@ -494,7 +494,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * @Test
      */
-    public function test_prepare_dao_clss_nnottion() {
+    public function test_prepare_dao_clss_annottion() {
         $context = new DaoBuilderContext();
         $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
         
@@ -508,5 +508,19 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         
         $this->assertCount(1, $config);
         $this->assertEquals("/", $config['route']);
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_prepare_dao_returning_domain() {
+        $this->fail();
+    }
+    
+    /**
+     * @Test
+     */
+    public function test_prepare_dao_returning_alias_field() {
+        $this->fail();
     }
 }

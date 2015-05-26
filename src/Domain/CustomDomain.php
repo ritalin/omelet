@@ -3,6 +3,7 @@
 namespace Omelet\Domain;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 abstract class CustomDomain extends DomainBase {
     private $type;
@@ -26,6 +27,5 @@ abstract class CustomDomain extends DomainBase {
     }
 
     protected function convertResultsInternal($results, AbstractPlatform $platform) {
-        return $results
     }
 }

@@ -20,6 +20,9 @@ final class DomainFactory {
     ];
 
     public function parse($name, $type) {
+        if ($type === null) {
+            $type = Types\Type::STRING;
+        }
         if (isset(self::$alias[$type])) {
             $type = self::$alias[$type];
         }
@@ -54,14 +57,12 @@ final class DomainFactory {
             $ref->getProperties(),
             function (array &$tmp, \ReflectionProperty $f) use($reader) {
                 $annotations = $reader->getPropertyAnnotations($f);
-                $domain = $this->parse($f->name, $this->extractAnnotation($annotations, ColumnType::class));
-
-                if (($name = $this->extractAnnotation($annotations, Colimn::class)) !== null) {
-                    return $tmp + array_fill_keys([$f->name, name], $domain);
-                }
-                else {
-                    return $tmp + [$f->name => $domain];
-                }
+                
+                $columnType = $this->extractAnnotation($annotations, ColumnType::class, function ($a) { return $a->type; } );                
+                $alias = $this->extractAnnotation($annotations, Colimn::class, function ($a) { return $a; });
+                $domain = $this->parse($f->name, $columnType);
+                
+                return $tmp + [$f->name => new NamedAliasDomain($domain, $f->name, $alias)];
             },
             []
         );
@@ -80,14 +81,14 @@ final class DomainFactory {
         return count($tmp) > 0;
     }
     
-    private function extractAnnotation(array $annotations, $class) {
+    private function extractAnnotation(array $annotations, $class, callable $fn) {
         $tmp = array_filter(
             $annotations,
-            function ($a) {
+            function ($a) use($class) {
                 return $a instanceof $class;
             }
         );
         
-        return count($tmp) > 0 ? array_shift($tmp)->type : Type::STRING;
+        return count($tmp) > 0 ? $fn(array_shift($tmp)) : null;
     }
 }
