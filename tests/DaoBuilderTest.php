@@ -164,7 +164,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_all() {
         $dao = $this->exportDao(TodoDao::class);
@@ -189,7 +189,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_by_id() {
         $dao = $this->exportDao(TodoDao::class);
@@ -204,7 +204,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_with_range() {
         $logger = null;
@@ -226,7 +226,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_insert() {
         $logger = null;
@@ -251,7 +251,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_update() {
         $logger = null;
@@ -275,7 +275,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_delete() {
         $logger = null;
@@ -292,7 +292,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_with_domain() {
         $dao = $this->exportDao(TodoDao2::class);
@@ -308,7 +308,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @Test
+     * @test
      */
     public function test_build_prepare_with_returning() {
         $context = new DaoBuilderContext();
@@ -365,7 +365,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
    
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_returning_primitive() {
         $logger = null;
@@ -380,7 +380,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
    
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_returning_domain() {
         $logger = null;
@@ -399,7 +399,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
    
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_returning_primitive_array() {
         $logger = null;
@@ -413,7 +413,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
    
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_returning_domain_array() {
         $logger = null;
@@ -425,8 +425,9 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(3, $results);
         $this->assertEquals([new PrimaryKey(3), new PrimaryKey(2), new PrimaryKey(1)], $results);
     }
+
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_returning_entity() {
         $logger = null;
@@ -442,7 +443,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_select_returning_entity_array() {
         $logger = null;
@@ -466,7 +467,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_export_insert_with_entity() {
         $logger = null;
@@ -493,7 +494,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_prepare_dao_clss_annottion() {
         $context = new DaoBuilderContext();
@@ -512,7 +513,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_prepare_dao_returning_domain() {
         $logger = null;
@@ -525,7 +526,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     }
     
     /**
-     * @Test
+     * @test
      */
     public function test_prepare_dao_returning_alias_field() {
         $logger = null;
@@ -538,5 +539,19 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(2, $results->id);
         $this->assertEquals("bbb", $results->todo);
         $this->assertEquals(new \DateTime("2015/05/11"), $results->created);
+    }
+
+    /**
+     * @test
+     */
+    public function test_select_returning_entity_default_value() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+    
+        $results = $dao->findById(new PrimaryKey(2));
+        
+        $this->assertInstanceOf(Todo::class, $results);        
+        $this->assertEquals(new Hidden(0), $results->hidden);
     }
 }
