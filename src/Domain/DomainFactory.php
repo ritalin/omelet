@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 
 use Omelet\Annotation\AnnotationConverterAdapter;
 use Omelet\Annotation\Entity;
+use Omelet\Annotation\ColumnType;
 use Omelet\Annotation\Column;
 
 final class DomainFactory {
@@ -19,6 +20,9 @@ final class DomainFactory {
     ];
 
     public function parse($name, $type) {
+        if ($type === null) {
+            $type = Types\Type::STRING;
+        }
         if (isset(self::$alias[$type])) {
             $type = self::$alias[$type];
         }
@@ -40,19 +44,25 @@ final class DomainFactory {
         }
         
         if (class_exists($type)) {
-            return self::parseAsEntity($name, new \ReflectionClass($type));
+            return self::parseAsEntity(new \ReflectionClass($type));
         }
         
         throw new \Exception("domain not found: ($type $name)");
     }
     
-    public function parseAsEntity($name, \ReflectionClass $ref) {
+    public function parseAsEntity(\ReflectionClass $ref) {
         $reader = new AnnotationConverterAdapter($ref);
         
         $fields = array_reduce(
             $ref->getProperties(),
             function (array &$tmp, \ReflectionProperty $f) use($reader) {
-                return $tmp + [$f->name => $this->parse($f->name, $this->fieldType($f, $reader))];
+                $annotations = $reader->getPropertyAnnotations($f);
+                
+                $columnType = $this->extractAnnotation($annotations, ColumnType::class, function ($a) { return $a->type; } );                
+                $alias = $this->extractAnnotation($annotations, Column::class, function ($a) { return $a->alias; });
+                $domain = $this->parse($f->name, $columnType);
+                
+                return $tmp + [$f->name => new NamedAliasDomain($domain, $f->name, $alias)];
             },
             []
         );
@@ -71,14 +81,14 @@ final class DomainFactory {
         return count($tmp) > 0;
     }
     
-    private function fieldType(\ReflectionProperty $field, AnnotationConverterAdapter $reader) {
+    private function extractAnnotation(array $annotations, $class, callable $fn) {
         $tmp = array_filter(
-            $reader->getPropertyAnnotations($field),
-            function ($a) {
-                return $a instanceof Column;
+            $annotations,
+            function ($a) use($class) {
+                return $a instanceof $class;
             }
         );
         
-        return count($tmp) > 0 ? array_shift($tmp)->type : Type::STRING;
+        return count($tmp) > 0 ? $fn(array_shift($tmp)) : null;
     }
 }

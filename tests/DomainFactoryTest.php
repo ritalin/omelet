@@ -179,13 +179,17 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
         
         $this->assertCount(4, $children);
         
-        $this->assertInstanceOf(Domain\BuiltinDomain::class, $children['id']);
-        $this->assertEquals(Type::INTEGER, $children['id']->getType());
-        $this->assertInstanceOf(Domain\BuiltinDomain::class, $children['todo']);
-        $this->assertEquals(Type::STRING, $children['todo']->getType());
-        $this->assertInstanceOf(Domain\BuiltinDomain::class, $children['created']);
-        $this->assertEquals(Type::DATETIME, $children['created']->getType());
-        $this->assertInstanceOf(Domain\WrappedDomain::class, $children['hidden']);
+        $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
+        $this->assertInstanceOf(Domain\BuiltinDomain::class, $children['id']->getDomain());
+        $this->assertEquals(Type::INTEGER, $children['id']->getDomain()->getType());
+        $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['todo']);
+        $this->assertInstanceOf(Domain\BuiltinDomain::class, $children['todo']->getDomain());
+        $this->assertEquals(Type::STRING, $children['todo']->getDomain()->getType());
+        $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['created']);
+        $this->assertInstanceOf(Domain\BuiltinDomain::class, $children['created']->getDomain());
+        $this->assertEquals(Type::DATETIME, $children['created']->getDomain()->getType());
+        $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['hidden']);
+        $this->assertInstanceOf(Domain\WrappedDomain::class, $children['hidden']->getDomain());
         
         $entity = Todo::__set_state(
             ['id' => 1024, 'todo' => 'test', 'created' => new \DateTime('2015/5/18 12:7:09'), 'hidden' => new Hidden(false)]

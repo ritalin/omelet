@@ -13,12 +13,14 @@ use Omelet\Annotation\Core\DaoAnnotation;
  * @Annotation
  * @Target("PROPERTY")
  */
-final class Column implements Core\EntityFieldAnnotation {
-    public $alias;
+final class ColumnType implements Core\EntityFieldAnnotation {
+    public $type;
+    public $name;
     
     public static function __set_state($values) {
         $a = new self;
-        $a->alias = $values['alias'];
+        $a->type = $values['type'];
+        $a->name = $values['name'];
         
         return $a;
     }

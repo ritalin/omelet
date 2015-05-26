@@ -10,7 +10,7 @@ class ObjectDomain extends DomainBase {
      */
     private $type;
     /** 
-     * @var DomainBase[]
+     * @var NamedDomain[]
      */
     private $fields;
     
@@ -51,9 +51,7 @@ class ObjectDomain extends DomainBase {
         $obj = new $class();
 
         foreach ($this->fields as $name => $domain) {
-            if (isset($results[$name])) {
-                $obj->{$name} = $domain->convertResults($results[$name], $platform);
-            }
+            $obj->{$name} = $domain->convertResults($results, $platform);
         }
         
         return $obj;
