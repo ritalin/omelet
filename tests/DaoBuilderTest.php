@@ -16,6 +16,7 @@ use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
 use Omelet\Tests\Target\Existance;
 use Omelet\Tests\Target\PrimaryKey;
+use Omelet\Tests\Target\Hidden;
 use Omelet\Tests\Target\Todo;
 
 class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
@@ -514,7 +515,13 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      * @Test
      */
     public function test_prepare_dao_returning_domain() {
-        $this->fail();
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+        $entity = $dao->findByIdReturningAsDomain(new PrimaryKey(1));
+        
+        $this->assertInstanceOf(Todo::class, $entity);        
+        $this->assertEquals(new Hidden(1), $entity->hidden);
     }
     
     /**
