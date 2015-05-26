@@ -88,7 +88,7 @@ class ChangeWatcher {
         if ($this->historyModified()) {
             if ($permanently) {
                 $path = $this->getHistoryPath();
-                $dir = basename($path);
+                $dir = dirname($path);
                 
                 if (! file_exists($dir)) {
                     @mkdir($dir, 0777, true);
