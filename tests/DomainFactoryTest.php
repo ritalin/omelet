@@ -12,6 +12,7 @@ use Omelet\Domain\DomainFactory;
 use Omelet\Tests\Target\Telephone;
 use Omelet\Tests\Target\Todo;
 use Omelet\Tests\Target\Hidden;
+use Omelet\Tests\Target\Editor;
 
 class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -177,7 +178,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
         
         $children = $defs->getChildren();
         
-        $this->assertCount(4, $children);
+        $this->assertCount(5, $children);
         
         $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $children['id']->getDomain());
@@ -190,6 +191,10 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(Type::DATETIME, $children['created']->getDomain()->getType());
         $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['hidden']);
         $this->assertInstanceOf(Domain\WrappedDomain::class, $children['hidden']->getDomain());
+        $this->assertEquals(Hidden::class, $children['hidden']->getDomain()->getType());
+        $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
+        $this->assertInstanceOf(Domain\WrappedDomain::class, $children['creator']->getDomain());
+        $this->assertEquals(Editor::class, $children['creator']->getDomain()->getType());
         
         $entity = Todo::__set_state(
             ['id' => 1024, 'todo' => 'test', 'created' => new \DateTime('2015/5/18 12:7:09'), 'hidden' => new Hidden(false)]

@@ -31,6 +31,13 @@ class Todo {
     public $hidden;
     
     /**
+     * @Column(alias="cretor_id", optFields={"creator_name"})
+     *
+     * @var Editor
+     */
+    public $creator;
+
+    /**
      * @param calable(Todo -> Void) fn
      */
     public function __construct(callable $fn = null) {

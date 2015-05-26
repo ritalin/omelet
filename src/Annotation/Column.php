@@ -24,10 +24,16 @@ final class Column implements Core\EntityFieldAnnotation {
      */
     public $default;
 
+    /**
+     * @var string[]
+     */
+    public $optFields = [];
+
     public static function __set_state($values) {
         $a = new self;
         $a->alias = $values['alias'];
-        $a-> default= $values['default'];
+        $a->default = $values['default'];
+        $a->optFields = $values['optFields'];
         
         return $a;
     }
