@@ -55,10 +55,10 @@ class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
         id: {
             $annotations = $commentParser->getPropertyAnnotations($intf->getProperty('id'));
             
-            $this->assertCount(1, $annotations);
-            $this->assertInstanceOf(ColumnType::class, $annotations[0]);
-            $this->assertEquals('integer', $annotations[0]->type);
-            $this->assertEquals('id', $annotations[0]->name);
+            $this->assertCount(2, $annotations);
+            $this->assertInstanceOf(ColumnType::class, $annotations[1]);
+            $this->assertEquals('integer', $annotations[1]->type);
+            $this->assertEquals('id', $annotations[1]->name);
         }
         created: {
             $annotations = $commentParser->getPropertyAnnotations($intf->getProperty('created'));

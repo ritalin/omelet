@@ -7,6 +7,8 @@ use Omelet\Annotation\Column;
 
 class Todo {
     /**
+     * @Column(alias="todo_id")
+     *
      * @var integer
      */
     public $id;

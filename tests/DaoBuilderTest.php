@@ -528,6 +528,15 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      * @Test
      */
     public function test_prepare_dao_returning_alias_field() {
-        $this->fail();
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+    
+        $results = $dao->findByIdReturningAlias(new PrimaryKey(2));
+        
+        $this->assertInstanceOf(Todo::class, $results);        
+        $this->assertEquals(2, $results->id);
+        $this->assertEquals("bbb", $results->todo);
+        $this->assertEquals(new \DateTime("2015/05/11"), $results->created);
     }
 }
