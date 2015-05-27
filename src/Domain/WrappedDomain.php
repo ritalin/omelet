@@ -31,15 +31,12 @@ class WrappedDomain extends DomainBase {
             $results = current($results);
         }
         
-        if (is_array($results)) {
-            $ref = new \ReflectionClass($this->type);
-            
+        $ref = new \ReflectionClass($this->type);
+        if (is_array($results)) {        
             return $ref->newInstanceArgs($results);
         }
         else {
-            $class = $this->type;
-        
-            return new $class($results);
+            return $ref->newInstance($results);
         }
     }
     

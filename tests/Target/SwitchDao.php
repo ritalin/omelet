@@ -9,5 +9,5 @@ interface SwitchDao {
     /**
      * @Select
      */
-    function findB();
+    function findA();
 }

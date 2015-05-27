@@ -22,6 +22,10 @@ final class DomainFactory {
     ];
 
     public function parse($name, $type, CaseSensor $sensor) {
+        return $this->parseInternal($name, $type, $sensor, true);
+    }
+
+    public function parseInternal($name, $type, CaseSensor $sensor, $hasName) {
         if ($type === null) {
             $type = Types\Type::STRING;
         }
@@ -30,7 +34,7 @@ final class DomainFactory {
         }
         
         if (($p = strrpos($type, '[]')) !== false) {
-            return new ArrayDomain($this->parse('', substr($type, 0, $p), $sensor));
+            return new ArrayDomain($this->parseInternal('', substr($type, 0, $p), $sensor, true));
         }
         
         if ($type === Types\Type::TARRAY) {
@@ -42,7 +46,7 @@ final class DomainFactory {
         }
         
         if (is_subclass_of($type, DomainBase::class)) {
-            return new WrappedDomain($type);
+            return $this->parseAsDomain($type, $sensor, $hasName);
         }
         
         if (class_exists($type)) {
@@ -52,6 +56,79 @@ final class DomainFactory {
         throw new \Exception("domain not found: ($type $name)");
     }
     
+    private function parseParamDomain(array $params, array $annotations, CaseSensor $sensor) {
+        $paramNames = array_map(
+            function (\ReflectionParameter $p) { return $p->name; },
+            $params
+        );
+
+        $annotations = array_reduce(
+            $annotations,
+            function (array &$tmp, ParamAlt $a) use($paramNames) {
+                if (in_array($a->name, $paramNames)) {
+                    $tmp[$a->name] = $a;
+                }
+                
+                return $tmp;
+            },
+            array_fill_keys($paramNames, null)
+        );
+
+        return array_map(
+            function (ParamAlt $a) use($sensor) {
+                return $this->parseInternal($a->name, $a->type, $sensor, false);
+            },
+            $annotations
+        )
+    }
+
+    public function parseAsDomain($type, CaseSensor $sensor, $hasName) {
+        $ref = \ReflectionClass($type);
+        $reader = new AnnotationConverterAdapter($ref);
+
+        $ctor = $ref->getConstructor();
+        $domains = $this->parseParamDomain($ctor->getParameters(), $reader->getMethodAnnotations($ctor));
+
+        if (! $hasName) {
+            return new WrappedDomain($type, array_values($domains));
+        }
+        else {
+            $domains = array_map(
+                function ($name) use($domains, $sensor) {
+                    if (($m = $this->getGetterMethod($m)) === false) return $domains[$name];
+
+                    $annotations = $reader->getMethodAnnotations($m);
+
+                    list($alias, $default) = $this->extractAnnotation(
+                        $annotations, Column::class, function ($a) { 
+                            return [ $a->alias, $a->default ]; 
+                        }
+                    );
+
+                    return new NamedAliasDomain(
+                        $domains[$name], $sensor->convert($name), $sensor->convert($alias), $default
+                    );
+                },
+                array_keys($domains)
+            );
+
+            return new WrappedDomain($type, $domains);
+        }
+    }
+
+    private function getGetterMethod(\ReflectionClass $ref, $name) {
+        if ($ref->hasMethod($name)) {
+            return $ref->getMethod($name);
+        }
+
+        $name = 'get' . ucfirst($name);
+        if ($ref->hasMethod($name)){
+            return $ref->getMethod($name);
+        }
+
+        return false;
+    }
+
     public function parseAsEntity(\ReflectionClass $ref, CaseSensor $sensor) {
         $reader = new AnnotationConverterAdapter($ref);
         
@@ -66,7 +143,7 @@ final class DomainFactory {
                         return [ $a->alias, $a->default, $a->optFields ]; 
                     }
                 );
-                $domain = $this->parse($f->name, $columnType, $sensor);
+                $domain = $this->parseInternal($f->name, $columnType, $sensor, false);
                 
                 $optFields = array_map(
                     function ($name) use($sensor) { return $sensor->convert($name); },

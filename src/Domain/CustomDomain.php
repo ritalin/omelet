@@ -40,7 +40,7 @@ abstract class CustomDomain extends DomainBase {
     /**
      * @return mixed
      */
-    protected function getValue() {
+    public function getValue() {
         return $this->value;
     }
     
