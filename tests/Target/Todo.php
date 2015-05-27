@@ -31,7 +31,7 @@ class Todo {
     public $hidden;
     
     /**
-     * @Column(alias="cretor_id", optFields={"creator_name"})
+     * @Column(alias="creator_id", optFields={"creator_name"})
      *
      * @var Editor
      */

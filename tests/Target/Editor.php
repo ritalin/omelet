@@ -7,11 +7,15 @@ use Doctrine\DBAL\Types\Type;
 use Omelet\Domain\CustomDomain;
 
 class Editor extends CustomDomain {
-	/**
-	 * @param integer editorId
-	 * @param string editorName
-	 */
-    public function __construct($editorId, $editorName) {
-        parent::__construct(Type::BOOLEAN, $editorId);
+    public function __construct($editorId, $editorName = "") {
+        parent::__construct(Type::INTEGER, $editorId, ['name' => $editorName]);
+    }
+    
+    public function getId() {
+        return $this->getValue();
+    }
+    
+    public function getName() {
+        return $this->getOptValue('name');
     }
 }

@@ -66,6 +66,22 @@ interface TodoDao2 {
      * @return Todo
      */
     function findByIdReturningAlias(PrimaryKey $key);
+
+    /**
+     * @Select
+     *
+     * @param PrimaryKey key
+     * @return Todo
+     */
+    function findByIdReturningEditorKeyOnly(PrimaryKey $key);
+
+    /**
+     * @Select
+     *
+     * @param PrimaryKey key
+     * @return Todo
+     */
+    function findByIdReturningEditor(PrimaryKey $key);
     
     /**
      * @Select

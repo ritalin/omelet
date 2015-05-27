@@ -16,6 +16,7 @@ use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
 use Omelet\Tests\Target\Existance;
 use Omelet\Tests\Target\PrimaryKey;
+use Omelet\Tests\Target\Editor;
 use Omelet\Tests\Target\Hidden;
 use Omelet\Tests\Target\Todo;
 
@@ -553,5 +554,27 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         
         $this->assertInstanceOf(Todo::class, $results);        
         $this->assertEquals(new Hidden(0), $results->hidden);
+    }
+
+    /**
+     * @test
+     */
+    public function test_select_returning_entity_multi_args_domain() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+        
+        keyonly: {
+            $results = $dao->findByIdReturningEditorKeyOnly(new PrimaryKey(1));
+            $this->assertInstanceOf(Todo::class, $results);
+            $this->assertEquals(108, $results->creator->getId());
+            $this->assertEquals("", $results->creator->getName());
+        }
+        keyvalue: {
+            $results = $dao->findByIdReturningEditor(new PrimaryKey(1));
+            $this->assertInstanceOf(Todo::class, $results);        
+            $this->assertEquals(108, $results->creator->getId());
+            $this->assertEquals('Foo', $results->creator->getName());
+        }
     }
 }

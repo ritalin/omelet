@@ -83,6 +83,13 @@ class AnnotationConverterAdapterTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals(Hidden::class, $annotations[1]->type);
             $this->assertEquals('hidden', $annotations[1]->name);
         }
+        creator: {
+            $annotations = $commentParser->getPropertyAnnotations($intf->getProperty('creator'));
+        
+            $this->assertCount(2, $annotations);
+            $this->assertInstanceOf(Column::class, $annotations[0]);
+            $this->assertEquals(['creator_name'], $annotations[0]->optFields);
+        }
     }
      
     /**
