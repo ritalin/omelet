@@ -12,6 +12,8 @@ use Omelet\Builder\DaoBuilder;
 use Omelet\Domain;
 use Omelet\Domain\DomainFactory;
 
+use Omelet\Util\CaseSensor;
+
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
 use Omelet\Tests\Target\Existance;
@@ -330,7 +332,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         listAll: {
             $info = $methods['listAll'];
-            $actial = $factory->parse('', Todo::class);
+            $actial = $factory->parse('', Todo::class, CaseSensor::LowerSnake());
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
@@ -339,7 +341,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         listAllAsRawArray: {
             $info = $methods['listAllAsRawArray'];
-            $actial = $factory->parse('', Todo::class);
+            $actial = $factory->parse('', Todo::class, CaseSensor::LowerSnake());
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
@@ -348,7 +350,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         listByPub: {
             $info = $methods['listByPub'];
-            $actial = $factory->parse('', Todo::class);
+            $actial = $factory->parse('', Todo::class, CaseSensor::LowerSnake());
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
@@ -357,7 +359,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
         findById: {
             $info = $methods['findById'];
-            $actial = $factory->parse('', Todo::class);
+            $actial = $factory->parse('', Todo::class, CaseSensor::LowerSnake());
         
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']);
@@ -575,6 +577,108 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             $this->assertInstanceOf(Todo::class, $results);        
             $this->assertEquals(108, $results->creator->getId());
             $this->assertEquals('Foo', $results->creator->getName());
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function test_build_prepare_with_returning_case_sensitive() {
+        $context = new DaoBuilderContext();
+        $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
+        
+        $factory = new DomainFactory();
+        
+        lowerSnake: {
+            $builder->prepare();
+            $methods = $builder->getMethods();
+        
+            $info = $methods['findByIdReturningEditor'];
+
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']);
+            
+            $children = $info['returnDomain']->getChildren();
+            
+            $this->assertArrayHasKey('id', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
+            $this->assertEquals('id', $children['id']->getName());
+            $this->assertEquals('todo_id', $children['id']->getAlias());
+            
+            $this->assertArrayHasKey('creator', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
+            $this->assertEquals('creator', $children['creator']->getName());
+            $this->assertEquals('creator_id', $children['creator']->getAlias());
+            $this->assertEquals(['creator_name'], $children['creator']->getOptFields());
+        }
+        upperSnake: {
+            $builder->setReturnCaseSensor(CaseSensor::UpperSnake());
+            $builder->prepare();
+            $methods = $builder->getMethods();
+        
+            $info = $methods['findByIdReturningEditor'];
+
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']);
+            
+            $children = $info['returnDomain']->getChildren();
+            
+            $this->assertArrayHasKey('id', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
+            $this->assertEquals('ID', $children['id']->getName());
+            $this->assertEquals('TODO_ID', $children['id']->getAlias());
+            
+            $this->assertArrayHasKey('creator', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
+            $this->assertEquals('CREATOR', $children['creator']->getName());
+            $this->assertEquals('CREATOR_ID', $children['creator']->getAlias());
+            $this->assertEquals(['CREATOR_NAME'], $children['creator']->getOptFields());
+        }
+        lowerCamel: {
+            $builder->setReturnCaseSensor(CaseSensor::LowerCamel());
+            $builder->prepare();
+            $methods = $builder->getMethods();
+        
+            $info = $methods['findByIdReturningEditor'];
+
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']);
+            
+            $children = $info['returnDomain']->getChildren();
+            
+            $this->assertArrayHasKey('id', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
+            $this->assertEquals('id', $children['id']->getName());
+            $this->assertEquals('todoId', $children['id']->getAlias());
+            
+            $this->assertArrayHasKey('creator', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
+            $this->assertEquals('creator', $children['creator']->getName());
+            $this->assertEquals('creatorId', $children['creator']->getAlias());
+            $this->assertEquals(['creatorName'], $children['creator']->getOptFields());
+        }
+        upperCamel: {
+            $builder->setReturnCaseSensor(CaseSensor::UpperCamel());
+            $builder->prepare();
+            $methods = $builder->getMethods();
+        
+            $info = $methods['findByIdReturningEditor'];
+
+            $this->assertArrayHasKey('returnDomain', $info);
+            $this->assertInstanceOf(Domain\ObjectDomain::class, $info['returnDomain']);
+            
+            $children = $info['returnDomain']->getChildren();
+            
+            $this->assertArrayHasKey('id', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
+            $this->assertEquals('Id', $children['id']->getName());
+            $this->assertEquals('TodoId', $children['id']->getAlias());
+            
+            $this->assertArrayHasKey('creator', $children);
+            $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
+            $this->assertEquals('Creator', $children['creator']->getName());
+            $this->assertEquals('CreatorId', $children['creator']->getAlias());
+            $this->assertEquals(['CreatorName'], $children['creator']->getOptFields());
         }
     }
 }

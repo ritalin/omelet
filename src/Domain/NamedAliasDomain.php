@@ -35,6 +35,18 @@ class NamedAliasDomain extends DomainBase {
         $this->optFields = $optFields;
 	}
 	
+	public function getName() {
+	    return $this->name;
+	}
+	
+	public function getAlias() {
+	    return $this->alias;
+	}
+	
+	public function getOptFields() {
+	    return array_keys($this->optFields);
+	}
+	
 	public function getDomain() {
 	    return $this->domain;
 	}

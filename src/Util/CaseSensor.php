@@ -41,7 +41,7 @@ final class CaseSensor {
      */
     private $formatter;
     
-    public function __construct(Format\FormatInterface $formatter) {
+    private function __construct(Format\FormatInterface $formatter) {
         $this->formatter = $formatter;
     }
     

@@ -14,6 +14,8 @@ use Omelet\Tests\Target\Todo;
 use Omelet\Tests\Target\Hidden;
 use Omelet\Tests\Target\Editor;
 
+use Omelet\Util\CaseSensor;
+
 class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     /**
      * @Test
@@ -21,28 +23,28 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     public function test_built_in_domain() {
         $factory = new DomainFactory();
         
-        $defs = $factory->parse('bbb', 'integer');
+        $defs = $factory->parse('bbb', 'integer', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::INTEGER, $defs->getType());
         $this->assertEquals(['bbb' => Type::getType(Type::INTEGER)], $defs->expandTypes('bbb', 123));
         $this->assertEquals(['bbb' => 123], $defs->expandValues('bbb', 123));
         
-        $defs = $factory->parse('bbb', 'boolean');
+        $defs = $factory->parse('bbb', 'boolean', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::BOOLEAN, $defs->getType());
         $this->assertEquals(['bbb' => Type::getType(Type::BOOLEAN)], $defs->expandTypes('bbb', false));
         $this->assertEquals(['bbb' => false], $defs->expandValues('bbb', false));
         
-        $defs = $factory->parse('bbb', 'float');
+        $defs = $factory->parse('bbb', 'float', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::FLOAT, $defs->getType());
         $this->assertEquals(['bbb' => Type::getType(Type::FLOAT)], $defs->expandTypes('bbb', 98.7));
         $this->assertEquals(['bbb' => 98.7], $defs->expandValues('bbb', 98.7));
         
-        $defs = $factory->parse('bbb', 'string');
+        $defs = $factory->parse('bbb', 'string', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::STRING, $defs->getType());
@@ -56,28 +58,28 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     public function test_built_in_domain_alias() {
         $factory = new DomainFactory();
     
-        $defs = $factory->parse('aaa', 'int');
+        $defs = $factory->parse('aaa', 'int', CaseSensor::LowerSnake());
         
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::INTEGER, $defs->getType());
         $this->assertEquals(['aaa' => Type::getType(Type::INTEGER)], $defs->expandTypes('aaa', 123));
         $this->assertEquals(['aaa' => 123], $defs->expandValues('aaa', 123));
         
-        $defs = $factory->parse('aaa', 'double');
+        $defs = $factory->parse('aaa', 'double', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::FLOAT, $defs->getType());
         $this->assertEquals(['aaa' => Type::getType(Type::FLOAT)], $defs->expandTypes('aaa', 12.34));
         $this->assertEquals(['aaa' => 12.34], $defs->expandValues('aaa', 12.34));
         
-        $defs = $factory->parse('aaa', 'bool');
+        $defs = $factory->parse('aaa', 'bool', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::BOOLEAN, $defs->getType());
         $this->assertEquals(['aaa' => Type::getType(Type::BOOLEAN)], $defs->expandTypes('aaa', true));
         $this->assertEquals(['aaa' => true], $defs->expandValues('aaa', true));
         
-        $defs = $factory->parse('aaa', '\DateTime');
+        $defs = $factory->parse('aaa', '\DateTime', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs);
         $this->assertEquals(Type::DATETIME, $defs->getType());
@@ -91,7 +93,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     public function test_built_array() {
         $factory = new DomainFactory();
     
-        $defs = $factory->parse('aaa', 'array');
+        $defs = $factory->parse('aaa', 'array', CaseSensor::LowerSnake());
         
         $t = Type::getType(Type::STRING);
         
@@ -101,7 +103,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals([$t, $t, $t], $defs->expandTypes('', ['123', '456', 'qwy']));
         $this->assertEquals(['123', '456', 'qwy'], $defs->expandValues('', ['123', '456', 'qwy']));
     
-        $defs = $factory->parse('aaa', 'string[]');
+        $defs = $factory->parse('aaa', 'string[]', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\ArrayDomain::class, $defs);
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs->childDomain());
@@ -112,7 +114,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
         );
         $this->assertEquals(['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], $defs->expandValues('', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy']));
     
-        $defs = $factory->parse('aaa', 'int[]');
+        $defs = $factory->parse('aaa', 'int[]', CaseSensor::LowerSnake());
         $t = Type::getType(Type::INTEGER);
 
         $this->assertInstanceOf(Domain\ArrayDomain::class, $defs);
@@ -121,7 +123,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(['aaa_0' => $t, 'aaa_1' => $t, 'aaa_2' => $t], $defs->expandTypes('aaa', [123, 456, 789]));
         $this->assertEquals(['aaa_0' => 123, 'aaa_1' => 456, 'aaa_2' => 789], $defs->expandValues('aaa', [123, 456, 789]));
     
-        $defs = $factory->parse('aaa', 'bool[]');
+        $defs = $factory->parse('aaa', 'bool[]', CaseSensor::LowerSnake());
         $t = Type::getType(Type::BOOLEAN);
 
         $this->assertInstanceOf(Domain\ArrayDomain::class, $defs);
@@ -136,7 +138,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
             $defs->expandValues('aaa', ['f1' => false, 'f2' => false, 'f3' => true])
         );
     
-        $defs = $factory->parse('aaa', 'int[][]');
+        $defs = $factory->parse('aaa', 'int[][]', CaseSensor::LowerSnake());
         $t = Type::getType(Type::INTEGER);
 
         $this->assertInstanceOf(Domain\ArrayDomain::class, $defs);
@@ -159,7 +161,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     public function test_built_custom_domain() {
         $factory = new DomainFactory();
     
-        $defs = $factory->parse('aaa', '\Omelet\Tests\Target\Telephone');
+        $defs = $factory->parse('aaa', '\Omelet\Tests\Target\Telephone', CaseSensor::LowerSnake());
         
         $this->assertInstanceOf(Domain\WrappedDomain::class, $defs);
         $this->assertEquals(['aaa' => Type::getType(Type::STRING)], $defs->expandTypes('aaa', new Telephone("080-999-9999")));
@@ -172,7 +174,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     public function test_built_entity() {
         $factory = new DomainFactory();
     
-        $defs = $factory->parse('aaa', '\Omelet\Tests\Target\Todo');
+        $defs = $factory->parse('aaa', '\Omelet\Tests\Target\Todo', CaseSensor::LowerSnake());
     
         $this->assertInstanceOf(Domain\ObjectDomain::class, $defs);
         
@@ -223,8 +225,8 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
         $factory = new DomainFactory();
     
         $defs = new Domain\ComplexDomain([
-            'obj' => $factory->parse('', '\Omelet\Tests\Target\Todo'),
-            'hoge' => $factory->parse('', 'int')
+            'obj' => $factory->parse('', '\Omelet\Tests\Target\Todo', CaseSensor::LowerSnake()),
+            'hoge' => $factory->parse('', 'int', CaseSensor::LowerSnake())
         ]);
         
         $children = $defs->getChildren();

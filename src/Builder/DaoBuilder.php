@@ -19,6 +19,9 @@ use Omelet\Annotation\Returning;
 use Omelet\Domain\DomainFactory;
 use Omelet\Domain\ComplexDomain;
 
+use Omelet\Util\CaseSensor;
+;
+
 class DaoBuilder {
     /**
      * @var \ReflectionClass 
@@ -40,10 +43,21 @@ class DaoBuilder {
      */
     private $factory;
     
+    /**
+     * @var CaseSensor
+     */
+    private $paramCaseSensor;
+    /**
+     * @var CaseSensor
+     */
+    private $returnCaseSensor;
+    
+    
     public function __construct(\ReflectionClass $intf, $className) {
         $this->intf = $intf;
         $this->className = $className;
         $this->factory = new DomainFactory();
+        $this->paramCaseSensor = $this->returnCaseSensor = CaseSensor::LowerSnake();
     }
     
     public function getInterfaceName() {
@@ -60,6 +74,20 @@ class DaoBuilder {
     
     public function getConfig() {
         return $this->config;
+    }
+    
+    public function getParamCaseSensor() {
+        return $this->paramCaseSensor;
+    }
+    public function setParamCaseSensor(CaseSensor $sensor) {
+        $this->paramCaseSensor = $sensor;
+    }
+    
+    public function getReturnCaseSensor() {
+        return $this->returnCaseSensor;
+    }
+    public function setReturnCaseSensor(CaseSensor $sensor) {
+        $this->returnCaseSensor = $sensor;
     }
     
     private function extractAnnotation(array $attrs, $class) {
@@ -125,7 +153,7 @@ class DaoBuilder {
                     $t = Type::STRING;
                 }
 
-                return $tmp + [$p->name => $this->factory->parse('', $t, $reader)];
+                return $tmp + [$p->name => $this->factory->parse('', $t, $this->paramCaseSensor)];
             },
             []
         );
@@ -137,10 +165,10 @@ class DaoBuilder {
         if ($this->extractAnnotation($attrs, Select::class) !== null) {
             $returning = $this->extractAnnotation($attrs, Returning::class);
             
-            return $this->factory->parse('', isset($returning) ? $returning->type : 'array', $reader);
+            return $this->factory->parse('', isset($returning) ? $returning->type : 'array', $this->returnCaseSensor);
         }
         else {
-            return $this->factory->parse('', 'int', $reader);
+            return $this->factory->parse('', 'int', $this->returnCaseSensor);
         }
     }
     

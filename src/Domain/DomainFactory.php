@@ -10,6 +10,8 @@ use Omelet\Annotation\Entity;
 use Omelet\Annotation\ColumnType;
 use Omelet\Annotation\Column;
 
+use Omelet\Util\CaseSensor;
+
 final class DomainFactory {
     private static $alias = [
         'int'       => Types\Type::INTEGER,
@@ -19,7 +21,7 @@ final class DomainFactory {
         'DateTime' => Types\Type::DATETIME,
     ];
 
-    public function parse($name, $type) {
+    public function parse($name, $type, CaseSensor $sensor) {
         if ($type === null) {
             $type = Types\Type::STRING;
         }
@@ -28,7 +30,7 @@ final class DomainFactory {
         }
         
         if (($p = strrpos($type, '[]')) !== false) {
-            return new ArrayDomain($this->parse('', substr($type, 0, $p)));
+            return new ArrayDomain($this->parse('', substr($type, 0, $p), $sensor));
         }
         
         if ($type === Types\Type::TARRAY) {
@@ -44,29 +46,36 @@ final class DomainFactory {
         }
         
         if (class_exists($type)) {
-            return self::parseAsEntity(new \ReflectionClass($type));
+            return self::parseAsEntity(new \ReflectionClass($type), $sensor);
         }
         
         throw new \Exception("domain not found: ($type $name)");
     }
     
-    public function parseAsEntity(\ReflectionClass $ref) {
+    public function parseAsEntity(\ReflectionClass $ref, CaseSensor $sensor) {
         $reader = new AnnotationConverterAdapter($ref);
         
         $fields = array_reduce(
             $ref->getProperties(),
-            function (array &$tmp, \ReflectionProperty $f) use($reader) {
+            function (array &$tmp, \ReflectionProperty $f) use($reader, $sensor) {
                 $annotations = $reader->getPropertyAnnotations($f);
                 
                 $columnType = $this->extractAnnotation($annotations, ColumnType::class, function ($a) { return $a->type; } );                
                 list($alias, $default, $optFields) = $this->extractAnnotation(
-                    $annotations, Column::class, function ($a) { return [ $a->alias, $a->default, $a->optFields ]; }
+                    $annotations, Column::class, function ($a) { 
+                        return [ $a->alias, $a->default, $a->optFields ]; 
+                    }
                 );
-                $domain = $this->parse($f->name, $columnType);
-
+                $domain = $this->parse($f->name, $columnType, $sensor);
+                
+                $optFields = array_map(
+                    function ($name) use($sensor) { return $sensor->convert($name); },
+                    $optFields !== null ? $optFields : []
+                );
+                
                 return $tmp + [$f->name => new NamedAliasDomain(
-                    $domain, $f->name, $alias, $default, 
-                    array_flip($optFields !== null ? $optFields : [])
+                    $domain, $sensor->convert($f->name), $sensor->convert($alias), $default, 
+                    array_flip($optFields)
                 )];
             },
             []
