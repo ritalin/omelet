@@ -6,6 +6,7 @@ use Composer\Autoload\ClassLoader;
 
 use Omelet\Watch\ChangeWatcher;
 use Omelet\Watch\WatchMode;
+use Omelet\Util\CaseSensor;
 
 class DaoBuilderContext {
     public static function defaultConfig() {
@@ -15,6 +16,8 @@ class DaoBuilderContext {
             'pdoDsn' => [],
             'daoClassSuffix' => 'Impl',
             'watchMode' => WatchMode::Whenever(),
+            'paramCaseSensor' => null,
+            'returnCaseSensor' => null,
         ];
     }
     
@@ -87,6 +90,9 @@ class DaoBuilderContext {
         $ref = new \ReflectionClass($intfName);
         if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->outdated($className::AccessRoute)) {
             $builder = new DaoBuilder($ref, $className);
+            $builder->setParamCaseSensor($this->config['paramCaseSensor']);
+            $builder->getReturnCaseSensor($this->config['returnCaseSensor']);
+            
             $builder->prepare();
             
             file_put_contents($path, $builder->export(true));

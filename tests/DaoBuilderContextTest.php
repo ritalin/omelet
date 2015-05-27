@@ -5,6 +5,7 @@ namespace OmeletTests;
 use Omelet\Builder\DaoBuilderContext;
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Watch\WatchMode;
+use Omelet\Util\CaseSensor;
 
 class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
     /**
@@ -19,6 +20,8 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
             'pdoDsn' => [],
             'daoClassSuffix' => 'Impl',
             'watchMode' => WatchMode::Whenever(),
+            'paramCaseSensor' => null,
+            'returnCaseSensor' => null,
         ];
         
         $this->assertEquals($expects, $context->getConfig());
@@ -28,7 +31,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
      public function test_config() {
-        $context = new DaoBuilderContext(['sqlRootDir' => 'queries', 'watchMode' => WatchMode::Once()]);
+        $context = new DaoBuilderContext(['sqlRootDir' => 'queries', 'watchMode' => WatchMode::Once(), 'returnCaseSensor' => CaseSensor::UpperCamel()]);
      
         $expects = [
             'daoClassPath' => '_auto_generated',
@@ -36,6 +39,8 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
             'pdoDsn' => [],
             'daoClassSuffix' => 'Impl',
             'watchMode' => WatchMode::Once(),
+            'paramCaseSensor' => null,
+            'returnCaseSensor' => CaseSensor::UpperCamel(),
         ];
         
         $this->assertEquals($expects, $context->getConfig());
