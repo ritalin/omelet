@@ -9,14 +9,9 @@ class WrappedDomain extends DomainBase {
      * @var string
      */
     private $type;
-    /**
-     * @var ReflectionClass
-     */
-    private $ref;
     
     public function __construct($type) {
         $this->type = $type;
-        $this->ref = new \ReflectionClass($type);
     }
     
     public function getType() {
@@ -37,7 +32,9 @@ class WrappedDomain extends DomainBase {
         }
         
         if (is_array($results)) {
-            return $this->ref->newInstanceArgs($results);
+            $ref = new \ReflectionClass($this->type);
+            
+            return $ref->newInstanceArgs($results);
         }
         else {
             $class = $this->type;
