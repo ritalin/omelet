@@ -14,6 +14,10 @@ class WrappedDomain extends DomainBase {
         $this->type = $type;
     }
     
+    public function getType() {
+        return $this->type;
+    } 
+
     protected function expandTypesInternal($name, $val) {
         return ($val instanceof CustomDomain) ? $val->expandTypes($name, $val, false) : [];
     }
