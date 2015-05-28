@@ -9,6 +9,7 @@ use Omelet\Annotation\AnnotationConverterAdapter;
 use Omelet\Annotation\Entity;
 use Omelet\Annotation\ColumnType;
 use Omelet\Annotation\Column;
+use Omelet\Annotation\ParamAlt;
 
 use Omelet\Util\CaseSensor;
 
@@ -57,66 +58,77 @@ final class DomainFactory {
     }
     
     private function parseParamDomain(array $params, array $annotations, CaseSensor $sensor) {
-        $paramNames = array_map(
-            function (\ReflectionParameter $p) { return $p->name; },
-            $params
+        $paramTypes = array_reduce(
+            $params,
+            function (array &$tmp, \ReflectionParameter $p) { return $tmp + [$p->name => $p->getClass()]; }, 
+            []
         );
-
-        $annotations = array_reduce(
-            $annotations,
-            function (array &$tmp, ParamAlt $a) use($paramNames) {
-                if (in_array($a->name, $paramNames)) {
+        $paramNames = array_keys($paramTypes);
+        
+        $lookup = array_map(
+            function ($name) use($paramTypes) { return ParamAlt::__set_state(['type' => $paramTypes[$name], 'name' => $name]); },
+            array_combine($paramNames, $paramNames)
+        );
+        
+        $lookup = array_reduce(
+            $this->extractAnnotations($annotations, ParamAlt::class),
+            function (array &$tmp, ParamAlt $a) use($paramTypes) {
+                if (isset($paramTypes[$a->name])) {
                     $tmp[$a->name] = $a;
                 }
                 
                 return $tmp;
             },
-            array_fill_keys($paramNames, null)
+            $lookup
         );
 
         return array_map(
             function (ParamAlt $a) use($sensor) {
                 return $this->parseInternal($a->name, $a->type, $sensor, false);
             },
-            $annotations
-        )
+            $lookup
+        );
     }
 
     public function parseAsDomain($type, CaseSensor $sensor, $hasName) {
-        $ref = \ReflectionClass($type);
+        $ref = new \ReflectionClass($type);
         $reader = new AnnotationConverterAdapter($ref);
 
         $ctor = $ref->getConstructor();
-        $domains = $this->parseParamDomain($ctor->getParameters(), $reader->getMethodAnnotations($ctor));
+        $domains = $this->parseParamDomain($ctor->getParameters(), $reader->getMethodAnnotations($ctor), $sensor);
 
         if (! $hasName) {
             return new WrappedDomain($type, array_values($domains));
         }
         else {
-            $domains = array_map(
-                function ($name) use($domains, $sensor) {
-                    if (($m = $this->getGetterMethod($m)) === false) return $domains[$name];
+            $domains = array_reduce(
+                array_keys($domains),
+                function (array &$tmp, $name) use($ref, $reader, $domains, $sensor) {
+                    if (($m = $this->findGetterMethod($ref, $name)) === false) {
+                        $alias = $default = null;
+                    }
+                    else {
+                        $annotations = $reader->getMethodAnnotations($m);
 
-                    $annotations = $reader->getMethodAnnotations($m);
-
-                    list($alias, $default) = $this->extractAnnotation(
-                        $annotations, Column::class, function ($a) { 
-                            return [ $a->alias, $a->default ]; 
-                        }
-                    );
-
-                    return new NamedAliasDomain(
+                        list($alias, $default) = $this->extractAnnotation(
+                            $annotations, Column::class, function ($a) { 
+                                return [ $a->alias, $a->default ]; 
+                            }
+                        );
+                    }
+                    
+                    return $tmp + [$sensor->convert($name) => new NamedAliasDomain(
                         $domains[$name], $sensor->convert($name), $sensor->convert($alias), $default
-                    );
+                    )];
                 },
-                array_keys($domains)
+                []
             );
 
             return new WrappedDomain($type, $domains);
         }
     }
 
-    private function getGetterMethod(\ReflectionClass $ref, $name) {
+    private function findGetterMethod(\ReflectionClass $ref, $name) {
         if ($ref->hasMethod($name)) {
             return $ref->getMethod($name);
         }
@@ -172,13 +184,17 @@ final class DomainFactory {
         return count($tmp) > 0;
     }
     
-    private function extractAnnotation(array $annotations, $class, callable $fn) {
-        $tmp = array_filter(
+    private function extractAnnotations(array $annotations, $class) {
+        return array_filter(
             $annotations,
             function ($a) use($class) {
                 return $a instanceof $class;
             }
         );
+    }
+    
+    private function extractAnnotation(array $annotations, $class, callable $fn) {
+        $tmp = $this->extractAnnotations($annotations, $class);
         
         return count($tmp) > 0 ? $fn(array_shift($tmp)) : null;
     }

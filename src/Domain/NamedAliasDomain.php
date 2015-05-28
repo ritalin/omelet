@@ -70,11 +70,11 @@ class NamedAliasDomain extends DomainBase {
 
         if (count($this->optFields) === 0) return $value;
 
-        return array_merge([ $value ], $this->getOptValues($results));
+        return array_values(array_merge([ $value ], $this->getOptValues($results)));
     }
     
     private function getPrimaryValue(array &$results) {
-         if (($this->alias !== null) && isset($results[$this->alias])) {
+         if ((! empty($this->alias)) && isset($results[$this->alias])) {
             return $results[$this->alias];
         }
         else if (isset($results[$this->name])) {
@@ -86,7 +86,13 @@ class NamedAliasDomain extends DomainBase {
     }
     
     private function getOptValues(array &$results) {
-        return array_values(array_intersect_key($results, $this->optFields));
+        return array_reduce(
+            array_keys($this->optFields),
+            function (array &$tmp, $name) use($results) { 
+                return $tmp + [$name => isset($results[$name]) ? $results[$name] : null];
+            },
+            []
+        );
     }
     
     public static function __set_state($values) {

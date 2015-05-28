@@ -110,7 +110,8 @@ class AnnotationConverter {
             'int', 'integer',
             'bool', 'boolean',
             'float', 'double',
-            'string', 'array'
+            'string', 'array',
+            'mixed', 'string',
         ];
         
         if (($p = strrpos($type, '[]')) !== false) {

@@ -1,3 +1,3 @@
-select 1 
+select 1 as value
 from todo
 where id = :id

@@ -16,6 +16,7 @@ use Omelet\Util\CaseSensor;
 
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
+use Omelet\Tests\Target\ConstDao;
 use Omelet\Tests\Target\Existance;
 use Omelet\Tests\Target\PrimaryKey;
 use Omelet\Tests\Target\Editor;
@@ -580,6 +581,20 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
+    /**
+     * @test
+     */
+    public function test_select_returning_emulti_args_domain() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(ConstDao::class, $logger);
+    
+        $results = $dao->getEditorConst();
+        $this->assertInstanceOf(Editor::class, $results);
+        $this->assertEquals(1024, $results->getId());
+        $this->assertEquals("Waaaah!!", $results->getName());
+    }
+    
     /**
      * @test
      */
