@@ -64,6 +64,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_update_dao_with_always_mode() {
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Always());
+        $this->modifyDao();
         $w->clear();
         
         $class = new \ReflectionClass(SwitchDao::class);
@@ -91,6 +92,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_update_dao_with_once_mode() {
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Once());
+        $this->modifyDao();
         $w->clear();
         
         $class = new \ReflectionClass(SwitchDao::class);
@@ -118,6 +120,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_update_dao_with_whenever_mode() {
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Whenever());
+        $this->modifyDao();
         $w->clear();
         
         $class = new \ReflectionClass(SwitchDao::class);
@@ -144,6 +147,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_update_dao_with_always_mode_permanently() {
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Always());
+        $this->modifyDao();
         $w->clear();
         
         $class = new \ReflectionClass(SwitchDao::class);
@@ -177,6 +181,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_update_dao_with_once_mode_permanently() {
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Once());
+        $this->modifyDao();
         $w->clear();
         
         $class = new \ReflectionClass(SwitchDao::class);
@@ -210,6 +215,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_update_dao_with_whenever_mode_permanently() {
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Whenever());
+        $this->modifyDao();
         $w->clear();
         
         $class = new \ReflectionClass(SwitchDao::class);
@@ -271,6 +277,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_update_sql_with_whenever_mode_permanently() {
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Whenever());
+        $this->modifyDao();
         $w->clear();
 
         $route = __DIR__ . '/fixtures/sql/SwitchDao';
