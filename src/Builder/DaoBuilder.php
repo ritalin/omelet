@@ -79,7 +79,7 @@ class DaoBuilder {
     public function getParamCaseSensor() {
         return $this->paramCaseSensor;
     }
-    public function setParamCaseSensor(CaseSensor $sensor) {
+    public function setParamCaseSensor($sensor) {
         if ($sensor === null) return;
         
         $this->paramCaseSensor = $sensor;
@@ -88,7 +88,7 @@ class DaoBuilder {
     public function getReturnCaseSensor() {
         return $this->returnCaseSensor;
     }
-    public function setReturnCaseSensor(CaseSensor $sensor) {
+    public function setReturnCaseSensor($sensor) {
         if ($sensor === null) return;
         
         $this->returnCaseSensor = $sensor;
