@@ -27,7 +27,7 @@ final class DomainFactory {
     }
 
     public function parseInternal($name, $type, CaseSensor $sensor, $hasName) {
-        if ($type === null) {
+        if (($type === null) || ($type === '')) {
             $type = Types\Type::STRING;
         }
         if (isset(self::$alias[$type])) {
@@ -60,7 +60,9 @@ final class DomainFactory {
     private function parseParamDomain(array $params, array $annotations, CaseSensor $sensor) {
         $paramTypes = array_reduce(
             $params,
-            function (array &$tmp, \ReflectionParameter $p) { return $tmp + [$p->name => $p->getClass()]; }, 
+            function (array &$tmp, \ReflectionParameter $p) { 
+                return $tmp + [$p->name => $p->getClass() !== null ? $p->getClass()->name : null]; 
+            }, 
             []
         );
         $paramNames = array_keys($paramTypes);

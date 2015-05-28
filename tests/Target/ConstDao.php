@@ -8,8 +8,6 @@ use Omelet\Annotation\Insert;
 use Omelet\Annotation\Update;
 use Omelet\Annotation\Delete;
 
-use Omelet\Annotation\ParamAlt;
-
 /**
  * @Dao(route="/")
  */
@@ -21,4 +19,11 @@ interface ConstDao {
      * @return Editor
      */
     function getEditorConst();
+    
+    /**
+     * @Select
+     *
+     * @return Timestamp
+     */
+    function now();
 }

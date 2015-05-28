@@ -21,6 +21,7 @@ use Omelet\Tests\Target\Existance;
 use Omelet\Tests\Target\PrimaryKey;
 use Omelet\Tests\Target\Editor;
 use Omelet\Tests\Target\Hidden;
+use Omelet\Tests\Target\Timestamp;
 use Omelet\Tests\Target\Todo;
 
 class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
@@ -419,6 +420,20 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function test_export_select_returning_object_domain() {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(ConstDao::class, $logger);
+    
+        $results = $dao->now();
+
+        $this->assertInstanceOf(Timestamp::class, $results);
+        $this->assertEquals(new \DateTime('2015/10/10 12:13:59'), $results->getValue());
+    }
+   
+    /**
+     * @test
+     */
     public function test_export_select_returning_domain_array() {
         $logger = null;
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
@@ -584,7 +599,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function test_select_returning_emulti_args_domain() {
+    public function test_select_returning_multi_args_domain() {
         $logger = null;
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
         $dao = $this->exportDao(ConstDao::class, $logger);
