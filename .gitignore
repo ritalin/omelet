@@ -1,6 +1,7 @@
+vendor/
 composer.lock
-tests/fixtures/.DS_Store
+**/.DS_Store
 tests/fixtures/exports/
 tests/fixtures/todo.sqlite3
-vendor/
 tests/fixtures/sql/SwitchDao/*.sql
+tests/Target/SwitchDao.php

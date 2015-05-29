@@ -9,20 +9,8 @@ use Omelet\Watch\WatchMode;
 use Omelet\Util\CaseSensor;
 
 class DaoBuilderContext {
-    public static function defaultConfig() {
-        return [
-            'daoClassPath' => '_auto_generated',
-            'sqlRootDir' => 'sql',
-            'pdoDsn' => [],
-            'daoClassSuffix' => 'Impl',
-            'watchMode' => WatchMode::Whenever(),
-            'paramCaseSensor' => null,
-            'returnCaseSensor' => null,
-        ];
-    }
-    
     /** 
-     * @var array
+     * @var Configuration
      */
     private $config;
     
@@ -31,36 +19,59 @@ class DaoBuilderContext {
      */
     private $watcher;
 
-    public function __construct(array $config = []) {
-        $this->config = array_merge(self::defaultConfig(), $config);
-        $this->watcher = new ChangeWatcher($this->config['daoClassPath'], $this->config['watchMode']);
+    public function __construct(Configuration $config) {
+        $this->config = $config;
+        $this->config->validate();
+
+        $this->watcher = new ChangeWatcher($this->config->daoClassPath, WatchMode::{$this->config->watchMode}());
 
         $loader = new ClassLoader();
-        $loader->addPsr4('', $this->config['daoClassPath']);
+        $loader->addPsr4('', $this->config->daoClassPath);
         $loader->register();
     }
     
+    /**
+     * @param string intfName
+     * @return string
+     */
     public function getDaoClassName($intfName) {
-        return $intfName . $this->config['daoClassSuffix'];
+        return $intfName . $this->config->daoClassSuffix;
     }
     
+    /**
+     * @return string
+     */
     public function connectionString() {
-        return implode('&', array_map(
-            function ($k, $v) { return "{$k}=${v}"; },
-            array_keys($this->config['pdoDsn']),
-            $this->config['pdoDsn']
-        ));
+        return $this->config->pdoDsn;
+    }
+    
+    /**
+     * @return array
+     */
+    public function dsn() {
+        return array_reduce(
+            explode('&', $this->config->pdoDsn),
+            function (array &$tmp, $kv) {
+                $tk = explode('=', $kv);
+
+                return $tmp + [trim($tk[0]) => trim($tk[1])];
+            },
+            []
+        );
     }
     
     private function normalizePath($path) {
         return str_replace(['/', "\\"], DIRECTORY_SEPARATOR, $path);
     }
 
+    /**
+     * @param string intfName
+     */
     public function queriesOf($intfName) {
         $className = $this->getDaoClassName($intfName);
         $accessRoute = $className::AccessRoute;
 
-        $rootDir = $this->normalizePath("{$this->config['sqlRootDir']}/{$accessRoute}");
+        $rootDir = $this->normalizePath("{$this->config->sqlRootDir}/{$accessRoute}");
 
         $t = new \ReflectionClass($intfName);
         
@@ -78,8 +89,11 @@ class DaoBuilderContext {
         );
     }
     
+    /**
+     * @param string intfName
+     */
     public function build($intfName) {
-        $classPath = $this->config['daoClassPath'];
+        $classPath = $this->config->daoClassPath;
         $className = $this->getDaoClassName($intfName);
         
         $path = $this->normalizePath("{$classPath}/{$className}.php");
@@ -90,8 +104,8 @@ class DaoBuilderContext {
         $ref = new \ReflectionClass($intfName);
         if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->outdated($className::AccessRoute)) {
             $builder = new DaoBuilder($ref, $className);
-            $builder->setParamCaseSensor($this->config['paramCaseSensor']);
-            $builder->setReturnCaseSensor($this->config['returnCaseSensor']);
+            $builder->setParamCaseSensor(CaseSensor::{$this->config->paramCaseSensor}());
+            $builder->setReturnCaseSensor(CaseSensor::{$this->config->returnCaseSensor}());
             
             $builder->prepare();
             
@@ -99,6 +113,9 @@ class DaoBuilderContext {
         }
     }
     
+    /**
+     * @return Configuration
+     */
     public function getConfig() {
         return $this->config;
     }

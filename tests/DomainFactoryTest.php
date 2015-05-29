@@ -18,7 +18,7 @@ use Omelet\Util\CaseSensor;
 
 class DomainFactoryTest extends \PHPUnit_Framework_TestCase {
     /**
-     * @Test
+     * @test
      */
     public function test_built_in_domain() {
         $factory = new DomainFactory();
