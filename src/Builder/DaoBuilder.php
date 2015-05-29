@@ -17,6 +17,7 @@ use Omelet\Annotation\Select;
 use Omelet\Annotation\Returning;
 
 use Omelet\Domain\DomainFactory;
+use Omelet\Domain\ArrayDomain;
 use Omelet\Domain\ComplexDomain;
 
 use Omelet\Util\CaseSensor;
@@ -291,7 +292,13 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         
         switch (get_class($method['type'])) {
         case Select::class:
-            $caller = "fetchAll";
+            $class = ArrayDomain::class;
+            if ($method['returnDomain'] instanceof $class) {
+                $caller = "fetchAll";
+            }
+            else {
+                $caller = "fetchRow";
+            }
             break;
         default:
             $caller = "execute";
