@@ -91,7 +91,7 @@ class DaoBuilderContext {
         if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->outdated($className::AccessRoute)) {
             $builder = new DaoBuilder($ref, $className);
             $builder->setParamCaseSensor($this->config['paramCaseSensor']);
-            $builder->getReturnCaseSensor($this->config['returnCaseSensor']);
+            $builder->setReturnCaseSensor($this->config['returnCaseSensor']);
             
             $builder->prepare();
             
