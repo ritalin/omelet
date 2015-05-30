@@ -1,6 +1,6 @@
 # Omelet - SQL base object mapper for php.
 
-This Library is nspired by Doma(https://github.com/domaframework/doma).
+This Library is inspired by Doma(https://github.com/domaframework/doma).
 
 ## Requirements
 
