@@ -20,4 +20,8 @@ Define the following requirement in your **composer.json** file:
 }
 ```
 
+## Sample Application
+
+Please see [ritalin/omelet-bear-example](https://github.com/ritalin/omelet-bear-example) implemented with BEAR.Sunday (https://github.com/bearsunday/BEAR.Sunday) framework.
+
 now work in progress ...
