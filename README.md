@@ -14,7 +14,9 @@ Define the following requirement in your **composer.json** file:
 
 ```json
 {
-    "ritalin/omelet": "*"
+    "require": {
+        "ritalin/omelet": "*"
+    }
 }
 ```
 
