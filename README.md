@@ -56,7 +56,7 @@ Define the following requirement in your **composer.json** file:
     * A Dao concrete class name note that 'Impl' is suffixed to interface name by default.
     
     ```php
-    $conn = \Doctrine\DBAL\DriverManager->getConnection($context->getConfig()->connectionString);
+    $conn = \Doctrine\DBAL\DriverManager->getConnection($context->connectionString());
     $dao = new TodoImpl($conn, $context);
     $rows = $dao->listAll();
     ```
