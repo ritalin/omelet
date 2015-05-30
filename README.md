@@ -36,7 +36,15 @@ Define the following requirement in your **composer.json** file:
     }
     ```
 
-2. Instanciate **\Omelet\Builder\DaoBuilderContext** .
+1. Prepare sql file of same name as method.
+    sql file path depends on namespace for dao interface.
+
+    ```sql
+    -- listAll.sql
+    select * from todo order by id
+    ```
+
+1. Instanciate **\Omelet\Builder\DaoBuilderContext** .
     * At least, need to a connection string to database as configuration.
     
     ```php
@@ -46,13 +54,13 @@ Define the following requirement in your **composer.json** file:
     $context = new \Omelet\Builder\DaoBuilderContext($config);
     ```
 
-3. Generate Dao concrete class.
+1. Generate Dao concrete class.
 
     ```php
     $context->build(Todo::class);
     ```
 
-4. Use Dao.
+1. Use Dao.
     * A Dao concrete class name note that 'Impl' is suffixed to interface name by default.
     
     ```php
