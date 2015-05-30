@@ -6,11 +6,11 @@ final class Configuration {
 	/**
 	 * @var string
 	 */
-    public $daoClassPath = '_auto_generated';
+    public $daoClassPath;
     /**
      * @var string
      */
-    public $sqlRootDir = 'sql';
+    public $sqlRootDir;
     /**
      * @var string
      */
@@ -43,9 +43,13 @@ final class Configuration {
      * $fn => Configuration -> Void
      */
     public function __construct(callable $fn = null) {
+        $appDir = dirname(dirname(__DIR__));
+        $this->daoClassPath = $appDir . '/sql';
+        $this->sqlRootDir = $appDir . '/_auto_generated';
+
     	if ($fn !== null) {
     		$fn($this);
-    	}
+        }
     }
 
     /**

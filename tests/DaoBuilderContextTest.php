@@ -12,6 +12,63 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
+    public function test_validate_config_required_default() {
+        $config = new Configuration;
+        $results = $config->validate(true);
+
+        $this->assertCount(1, $results);
+        $this->assertArrayHasKey('pdoDsn', $results);
+    }
+
+    /**
+     * @test
+     */
+    public function test_validate_config_required() {
+        $config = new Configuration;
+        $config->daoClassPath = '';
+        $results = $config->validate(true);
+
+        $this->assertCount(2, $results);
+        $this->assertArrayHasKey('daoClassPath', $results);
+        $this->assertArrayHasKey('pdoDsn', $results);
+    }
+
+    /**
+     * @test
+     */
+    public function test_validate_config_invalid_value() {
+        watchMode: {
+            $config = new Configuration;
+            $config->watchMode = 'hogeee';
+            $results = $config->validate(true);
+
+            $this->assertCount(2, $results);
+            $this->assertArrayHasKey('watchMode', $results);
+            $this->assertArrayHasKey('pdoDsn', $results);
+        }
+        paramCaseSensor: {
+            $config = new Configuration;
+            $config->paramCaseSensor = 'fooooo';
+            $results = $config->validate(true);
+
+            $this->assertCount(2, $results);
+            $this->assertArrayHasKey('paramCaseSensor', $results);
+            $this->assertArrayHasKey('pdoDsn', $results);
+        }
+        returnCaseSensor: {
+            $config = new Configuration;
+            $config->returnCaseSensor = 'wooooh';
+            $results = $config->validate(true);
+
+            $this->assertCount(2, $results);
+            $this->assertArrayHasKey('returnCaseSensor', $results);
+            $this->assertArrayHasKey('pdoDsn', $results);
+        }
+    }
+
+    /**
+     * @test
+     */
      public function test_config() {
      
         $config = new Configuration;
