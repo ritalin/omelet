@@ -42,24 +42,9 @@ class DaoBuilderContext {
      * @return string
      */
     public function connectionString() {
-        return $this->config->pdoDsn;
+        return $this->config->connectionString;
     }
-    
-    /**
-     * @return array
-     */
-    public function dsn() {
-        return array_reduce(
-            explode('&', $this->config->pdoDsn),
-            function (array &$tmp, $kv) {
-                $tk = explode('=', $kv);
 
-                return $tmp + [trim($tk[0]) => trim($tk[1])];
-            },
-            []
-        );
-    }
-    
     private function normalizePath($path) {
         return str_replace(['/', "\\"], DIRECTORY_SEPARATOR, $path);
     }

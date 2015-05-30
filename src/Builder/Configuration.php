@@ -19,7 +19,7 @@ final class Configuration {
     /**
      * @var string
      */
-    public $pdoDsn = '';
+    public $connectionString = '';
 
     /**
      * @var string
@@ -61,7 +61,7 @@ final class Configuration {
     	if (! $this->required($this->daoClassPath)) $invalidFields['daoClassPath'] = self::$requiredMsg;
     	if (! $this->required($this->sqlRootDir)) $invalidFields['sqlRootDir'] = self::$requiredMsg;
     	if (! $this->required($this->daoClassSuffix)) $invalidFields['daoClassSuffix'] = self::$requiredMsg;
-    	if (! $this->required($this->pdoDsn)) $invalidFields['pdoDsn'] = self::$requiredMsg;
+    	if (! $this->required($this->connectionString)) $invalidFields['connectionString'] = self::$requiredMsg;
 
     	$availables = ['Always', 'Whenever', 'Once'];
     	if (! $this->contains($this->watchMode, $availables)) {

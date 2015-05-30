@@ -17,7 +17,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
         $results = $config->validate(true);
 
         $this->assertCount(1, $results);
-        $this->assertArrayHasKey('pdoDsn', $results);
+        $this->assertArrayHasKey('connectionString', $results);
     }
 
     /**
@@ -30,7 +30,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertCount(2, $results);
         $this->assertArrayHasKey('daoClassPath', $results);
-        $this->assertArrayHasKey('pdoDsn', $results);
+        $this->assertArrayHasKey('connectionString', $results);
     }
 
     /**
@@ -44,7 +44,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
 
             $this->assertCount(2, $results);
             $this->assertArrayHasKey('watchMode', $results);
-            $this->assertArrayHasKey('pdoDsn', $results);
+            $this->assertArrayHasKey('connectionString', $results);
         }
         paramCaseSensor: {
             $config = new Configuration;
@@ -53,7 +53,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
 
             $this->assertCount(2, $results);
             $this->assertArrayHasKey('paramCaseSensor', $results);
-            $this->assertArrayHasKey('pdoDsn', $results);
+            $this->assertArrayHasKey('connectionString', $results);
         }
         returnCaseSensor: {
             $config = new Configuration;
@@ -62,7 +62,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
 
             $this->assertCount(2, $results);
             $this->assertArrayHasKey('returnCaseSensor', $results);
-            $this->assertArrayHasKey('pdoDsn', $results);
+            $this->assertArrayHasKey('connectionString', $results);
         }
     }
 
@@ -74,7 +74,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
         $config = new Configuration;
         $config->daoClassPath = '_auto_generated';
         $config->sqlRootDir = 'queries';
-        $config->pdoDsn = 'driver=pdo_sqlite&memory=true';
+        $config->connectionString = 'sqlite:///:memory:';
         $config->daoClassSuffix = 'Impl';
         $config->watchMode = 'Once';
         $config->returnCaseSensor = 'UpperCamel';
@@ -89,7 +89,7 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
      */
      public function test_dao_impl_class_name() {
         $context = new DaoBuilderContext(new Configuration(
-            function ($conf) { $conf->pdoDsn = 'driver=pdo_sqlite&memory=true'; }
+            function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         
         $this->assertEquals('Omelet\Tests\Target\TodoDaoImpl', $context->getDaoClassName(TodoDao::class));
@@ -100,9 +100,9 @@ class DaoBuilderContextTest extends \PHPUnit_Framework_TestCase {
      */
      public function test_db_connection_string() {
         $context = new DaoBuilderContext(new Configuration(
-            function ($conf) { $conf->pdoDsn = 'driver=pdo_sqlite&memory=true'; }
+            function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         
-        $this->assertEquals('driver=pdo_sqlite&memory=true', $context->connectionString());
+        $this->assertEquals('sqlite:///:memory:', $context->connectionString());
      }
 }

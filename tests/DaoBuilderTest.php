@@ -31,7 +31,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      */
      public function test_build_prepare() {
         $context = new DaoBuilderContext(new Configuration(
-            function ($conf) { $conf->pdoDsn = 'driver=pdo_sqlite&memory=true'; }
+            function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(new \ReflectionClass(TodoDao::class), $context->getDaoClassName(TodoDao::class));
         
@@ -152,7 +152,8 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $config = new Configuration;
         $values = [
             'sqlRootDir' => 'tests/fixtures/sql',
-            'pdoDsn' => 'driver=pdo_sqlite&path=tests/fixtures/todo.sqlite3',
+//            'connectionString' => 'sqlite:///tests/fixtures/todo.sqlite3', // For doctrine/DBAL bug 
+            'connectionString' => 'sqlite://localhost/?path=tests/fixtures/todo.sqlite3',
         ];
         foreach ($values as $f => $v) { $config->{$f} = $v; }
         $context = new DaoBuilderContext($config);
@@ -168,7 +169,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         require_once $path;
       
         $implClass = $builder->getClassName();
-        $conn = \Doctrine\DBAL\DriverManager::getConnection($context->dsn());
+        $conn = \Doctrine\DBAL\DriverManager::getConnection(['url' => $context->getConfig()->connectionString]);
         $conn->getConfiguration()->setSQLLogger($logger);
         
         return new $implClass($conn, $context);
@@ -323,7 +324,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_build_prepare_with_returning() {
         $context = new DaoBuilderContext(new Configuration(
-            function ($conf) { $conf->pdoDsn = 'driver=pdo_sqlite&memory=true'; }
+            function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
         
@@ -525,7 +526,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_prepare_dao_clss_annottion() {
         $context = new DaoBuilderContext(new Configuration(
-            function ($conf) { $conf->pdoDsn = 'driver=pdo_sqlite&memory=true'; }
+            function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
         
@@ -625,7 +626,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
      */
     public function test_build_prepare_with_returning_case_sensitive() {
         $context = new DaoBuilderContext(new Configuration(
-            function ($conf) { $conf->pdoDsn = 'driver=pdo_sqlite&memory=true'; }
+            function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class));
         
