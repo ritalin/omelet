@@ -87,7 +87,7 @@ class DaoBuilderContext {
         }
         
         $ref = new \ReflectionClass($intfName);
-        if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->outdated($className::AccessRoute)) {
+        if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->sqlOutdated($className::AccessRoute)) {
             $builder = new DaoBuilder($ref, $className);
             $builder->setParamCaseSensor(CaseSensor::{$this->config->paramCaseSensor}());
             $builder->setReturnCaseSensor(CaseSensor::{$this->config->returnCaseSensor}());
