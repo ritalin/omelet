@@ -98,6 +98,10 @@ class DaoBuilderContext {
         }
     }
     
+    public function saveHistory() {
+        $this->watcher->save();
+    }
+
     /**
      * @return Configuration
      */
