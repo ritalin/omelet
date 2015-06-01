@@ -74,15 +74,19 @@ class NamedAliasDomain extends DomainBase {
     }
     
     private function getPrimaryValue(array &$results) {
-         if ((! empty($this->alias)) && isset($results[$this->alias])) {
-            return $results[$this->alias];
+        $value = null;
+        if ((! empty($this->alias)) && isset($results[$this->alias])) {
+            $value = $results[$this->alias];
         }
         else if (isset($results[$this->name])) {
-            return $results[$this->name];
+            $value = $results[$this->name];
         }
-        else {
-            return $this->default;
+        
+        if ($value === null) {
+            $value =  $this->default;
         }
+        
+        return $value;
     }
     
     private function getOptValues(array &$results) {

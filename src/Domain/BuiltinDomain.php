@@ -28,10 +28,7 @@ class BuiltinDomain extends DomainBase {
         if (is_array($results)) {
             $results = current($results);
         }
-        if (($results === null) && ($this->type !== Type::STRING)) {
-            $results = 0;
-        }
-        
+
         return Type::getType($this->type)->convertToPHPValue($results, $platform);
     }
     
