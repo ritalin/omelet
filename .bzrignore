@@ -4,3 +4,4 @@ tests/fixtures/exports
 tests/fixtures/todo.sqlite3
 tests/fixtures/sql/SwitchDao/findA.sql
 tests/fixtures/sql/SwitchDao/findB.sql
+tests/Target/SwitchDao.php
