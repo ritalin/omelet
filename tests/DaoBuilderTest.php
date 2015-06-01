@@ -199,7 +199,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals("ccc", $row['todo']);
         $this->assertEquals(new \DateTime("2015/05/21 13:05:21"), new \DateTime($row['created']));
     }
-    
+
     /**
      * @test
      */
@@ -306,7 +306,17 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function test_export_select_with_domain() {
+    public function test_select_all_returing_top_left() {
+        $dao = $this->exportDao(TodoDao2::class);
+        
+        $value = $dao->listAllReturningTopLeft();
+        $this->assertEquals(1, $value);
+    }
+    
+    /**
+     * @test
+     */
+    public function test_select_with_domain() {
         $dao = $this->exportDao(TodoDao2::class);
     
         $results = $dao->listById(new PrimaryKey(2));

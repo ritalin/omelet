@@ -37,6 +37,13 @@ interface TodoDao2 {
     /**
      * @Select
      *
+     * @return integer
+     */
+    function listAllReturningTopLeft();
+    
+    /**
+     * @Select
+     *
      * @param DateTime from
      * @param DateTime to
      * @return Todo[] 
