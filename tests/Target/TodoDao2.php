@@ -64,7 +64,7 @@ interface TodoDao2 {
      * @param PrimaryKey key
      * @return Todo
      */
-    function findByIdReturningAsDomain(PrimaryKey $key);
+    function findByIdReturningEntityWithDomain(PrimaryKey $key);
 
     /**
      * @Select

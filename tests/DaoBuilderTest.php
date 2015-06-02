@@ -154,6 +154,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
             'sqlRootDir' => 'tests/fixtures/sql',
 //            'connectionString' => 'sqlite:///tests/fixtures/todo.sqlite3', // For doctrine/DBAL bug 
             'connectionString' => 'sqlite://localhost/?path=tests/fixtures/todo.sqlite3',
+            'watchMode' => 'Always'
         ];
         foreach ($values as $f => $v) { $config->{$f} = $v; }
         $context = new DaoBuilderContext($config);
@@ -559,7 +560,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase {
         $logger = null;
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
         $dao = $this->exportDao(TodoDao2::class, $logger);
-        $entity = $dao->findByIdReturningAsDomain(new PrimaryKey(1));
+        $entity = $dao->findByIdReturningEntityWithDomain(new PrimaryKey(1));
         
         $this->assertInstanceOf(Todo::class, $entity);        
         $this->assertEquals(new Hidden(1), $entity->hidden);
