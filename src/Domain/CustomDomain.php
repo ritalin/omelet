@@ -27,7 +27,7 @@ abstract class CustomDomain extends DomainBase {
     public function __construct($type, $value, array $optValues = []) {
         $this->type = $type;
         $this->value = $value;
-        $this->optValues = $optValues;
+        $this->optValues = array_merge(['value' => $value], $optValues);
     }
     
     /**

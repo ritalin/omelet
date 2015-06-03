@@ -18,4 +18,8 @@ class Editor extends CustomDomain {
     public function getName() {
         return $this->getOptValue('name');
     }
+    
+    public function name() {
+        return $this->getOptValue('name');
+    }
 }
