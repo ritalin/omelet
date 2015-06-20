@@ -6,9 +6,11 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Select
+ * Select.
  *
  * @Annotation
  * @Target("METHOD")
  */
-final class Select implements Core\DaoAnnotation {}
+final class Select implements Core\DaoAnnotation
+{
+}

@@ -6,9 +6,11 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Insert
+ * Insert.
  *
  * @Annotation
  * @Target("METHOD")
  */
-final class Insert implements Core\DaoAnnotation {}
+final class Insert implements Core\DaoAnnotation
+{
+}

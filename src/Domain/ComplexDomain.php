@@ -4,51 +4,58 @@ namespace Omelet\Domain;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class ComplexDomain extends DomainBase {
+class ComplexDomain extends DomainBase
+{
     private $domains;
     private $boundOneArray = false;
-    
-    public function __construct(array $domains) {
+
+    public function __construct(array $domains)
+    {
         if ((count($domains) === 1) && (current(array_values($domains)) instanceof ArrayDomain)) {
             $this->boundOneArray = true;
         }
-        
+
         $this->domains = $domains;
     }
-    
-    public function getChildren() {
+
+    public function getChildren()
+    {
         return $this->domains;
     }
-    
-    protected function expandTypesInternal($name, $val) {
+
+    protected function expandTypesInternal($name, $val)
+    {
         return array_reduce(
             array_keys($this->domains),
-            function (array &$tmp, $k) use($val) {
+            function (array &$tmp, $k) use ($val) {
                 $n = $this->boundOneArray ? '' : $k;
-                
+
                 return $tmp + [$k => $this->domains[$k]->expandTypes($n, $val[$k])];
             },
             []
         );
     }
-    
-    protected function expandValuesInternal($name, $val) {
+
+    protected function expandValuesInternal($name, $val)
+    {
         return array_reduce(
             array_keys($this->domains),
-            function (array &$tmp, $k) use($val) {
+            function (array &$tmp, $k) use ($val) {
                 $n = $this->boundOneArray ? '' : $k;
-                
+
                 return $tmp + [$k => $this->domains[$k]->expandValues($n, $val[$k])];
             },
             []
         );
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform) {
+    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    {
         return $results;
     }
-    
-    public static function __set_state($values) {
+
+    public static function __set_state($values)
+    {
         return new ComplexDomain($values['domains']);
     }
 }

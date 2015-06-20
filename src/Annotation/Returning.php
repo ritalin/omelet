@@ -4,25 +4,26 @@ namespace Omelet\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
-
 use Omelet\Annotation\Core\DaoAnnotation;
 
 /**
- * Returning
+ * Returning.
  *
  * @Annotation
  * @Target("METHOD")
  */
-final class Returning implements DaoAnnotation {
+final class Returning implements DaoAnnotation
+{
     /**
      * @var string
      */
     public $type;
-    
-    public static function __set_state($values) {
-        $a = new Returning();
+
+    public static function __set_state($values)
+    {
+        $a = new self();
         $a->type = $values['type'];
-        
+
         return $a;
     }
 }

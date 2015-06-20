@@ -13,59 +13,63 @@ use Omelet\Annotation\Update;
 
 use Doctrine\Common\Annotations\AnnotationException;
 
-class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
+class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase
+{
     /**
      * @test
      */
-     public function test_parse_no_doc_comment() {
-        $comment = "
+    public function test_parse_no_doc_comment()
+    {
+        $comment = '
             /**
              * foo, bar, baz
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(0, $annotations['params']);
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_no_return_comment() {
-        $comment = "
+    public function test_parse_no_return_comment()
+    {
+        $comment = '
             /**
              * @Select
              *
              * foo, bar, baz
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(0, $annotations['params']);
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_primitive() {
+    public function test_parse_return_primitive()
+    {
         $comment = '
             /**
              * @Select
@@ -75,27 +79,28 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @return boolean
              */
         ';
-        
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(0, $annotations['params']);
 
         $this->assertCount(1, $annotations['returns']);
         $this->assertInstanceOf(Returning::class, $annotations['returns'][0]);
         $this->assertEquals('boolean', $annotations['returns'][0]->type);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_primitive_array() {
+    public function test_parse_return_primitive_array()
+    {
         $comment = '
             /**
              * @Select
@@ -105,28 +110,29 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @return boolean[]
              */
         ';
-        
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(0, $annotations['params']);
 
         $this->assertCount(1, $annotations['returns']);
         $this->assertInstanceOf(Returning::class, $annotations['returns'][0]);
         $this->assertEquals('boolean[]', $annotations['returns'][0]->type);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_primitive_alias() {
-        $comment = "
+    public function test_parse_return_primitive_alias()
+    {
+        $comment = '
             /**
              * @Select
              *
@@ -134,22 +140,23 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              *
              * @return int
              */
-        ";
-        
+        ';
+
         $lexer = new \Doctrine\Common\Annotations\DocLexer;
         $lexer->setInput($comment);
-        
+
         $tokens = [];
-        
+
         while ($lexer->moveNext()) {
             $tokens[] = $lexer->lookahead;
         }
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_builtin_class() {
+    public function test_parse_return_builtin_class()
+    {
         $comment = '
             /**
              * @Select
@@ -159,27 +166,28 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @return DateTime
              */
         ';
-        
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(0, $annotations['params']);
 
         $this->assertCount(1, $annotations['returns']);
         $this->assertInstanceOf(Returning::class, $annotations['returns'][0]);
         $this->assertEquals(\DateTime::class, $annotations['returns'][0]->type);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_custom_class() {
+    public function test_parse_return_custom_class()
+    {
         $comment = '
             /**
              * @Select
@@ -189,27 +197,28 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @return Entity
              */
         ';
-        
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(0, $annotations['params']);
 
         $this->assertCount(1, $annotations['returns']);
         $this->assertInstanceOf(Returning::class, $annotations['returns'][0]);
         $this->assertEquals(Entity::class, $annotations['returns'][0]->type);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_custom_class_array() {
+    public function test_parse_return_custom_class_array()
+    {
         $comment = '
             /**
              * @Select
@@ -219,27 +228,28 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @return Entity[]
              */
         ';
-        
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(0, $annotations['params']);
 
         $this->assertCount(1, $annotations['returns']);
         $this->assertInstanceOf(Returning::class, $annotations['returns'][0]);
         $this->assertEquals(Entity::class . '[]', $annotations['returns'][0]->type);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_duplicated() {
+    public function test_parse_return_duplicated()
+    {
         $comment = '
             /**
              * @Select
@@ -250,32 +260,33 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @return string[]
              */
         ';
-        
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         try {
             $factory->parse($comment, '');
-            
+
             $this->fail();
         }
         catch (\Exception $ex) {
             if ($ex instanceof PHPUnit_Framework_AssertionFailedError) {
                 throw $ex;
             }
-            
+
             $this->assertInstanceOf(AnnotationException::class, $ex);
         }
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_return_invalid_class() {
+    public function test_parse_return_invalid_class()
+    {
         $comment = '
             /**
              * @Select
@@ -285,34 +296,35 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @return Hoge
              */
         ';
-        
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
-        
+
         try {
             $factory->parse($comment, '');
-            
+
             $this->fail();
         }
         catch (\Exception $ex) {
             if ($ex instanceof PHPUnit_Framework_AssertionFailedError) {
                 throw $ex;
             }
-            
+
             $this->assertInstanceOf(AnnotationException::class, $ex);
         }
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_param_primitive() {
-        $comment = "
+    public function test_parse_param_primitive()
+    {
+        $comment = '
             /**
              * @Select
              *
@@ -321,17 +333,17 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @param string bar
              * @param integer baz
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(2, $annotations['params']);
         $this->assertInstanceOf(ParamAlt::class, $annotations['params'][0]);
         $this->assertEquals('string', $annotations['params'][0]->type);
@@ -341,13 +353,14 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('baz', $annotations['params'][1]->name);
 
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_param_primitive_array() {
-        $comment = "
+    public function test_parse_param_primitive_array()
+    {
+        $comment = '
             /**
              * @Select
              *
@@ -355,29 +368,30 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              *
              * @param string[] bar
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(1, $annotations['params']);
         $this->assertInstanceOf(ParamAlt::class, $annotations['params'][0]);
         $this->assertEquals('string[]', $annotations['params'][0]->type);
 
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_param_builtin_class() {
-        $comment = "
+    public function test_parse_param_builtin_class()
+    {
+        $comment = '
             /**
              * @Select
              *
@@ -386,17 +400,17 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @param DateTime bar
              * @param integer baz
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(2, $annotations['params']);
         $this->assertInstanceOf(ParamAlt::class, $annotations['params'][0]);
         $this->assertEquals(\DateTime::class, $annotations['params'][0]->type);
@@ -406,13 +420,14 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('baz', $annotations['params'][1]->name);
 
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_param_custom_class() {
-        $comment = "
+    public function test_parse_param_custom_class()
+    {
+        $comment = '
             /**
              * @Select
              *
@@ -421,17 +436,17 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @param DateTime bar
              * @param Select foo
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(2, $annotations['params']);
         $this->assertInstanceOf(ParamAlt::class, $annotations['params'][0]);
         $this->assertEquals(\DateTime::class, $annotations['params'][0]->type);
@@ -441,13 +456,14 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('foo', $annotations['params'][1]->name);
 
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_both() {
-        $comment = "
+    public function test_parse_both()
+    {
+        $comment = '
             /**
              * @Select
              *
@@ -456,17 +472,17 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
              * @param DateTime foo
              * @return int
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(1, $annotations['params']);
         $this->assertInstanceOf(ParamAlt::class, $annotations['params'][0]);
         $this->assertEquals(\DateTime::class, $annotations['params'][0]->type);
@@ -475,155 +491,160 @@ class CommentToAnnotationTest extends \PHPUnit_Framework_TestCase {
         $this->assertCount(1, $annotations['returns']);
         $this->assertInstanceOf(Returning::class, $annotations['returns'][0]);
         $this->assertEquals('int', $annotations['returns'][0]->type);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_var_primitive() {
-        $comment = "
+    public function test_parse_var_primitive()
+    {
+        $comment = '
             /**
              * foo, bar, baz
              *
              * @var bool
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(1, $annotations['vars']);
         $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals('bool', $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_var_primitive_array() {
-        $comment = "
+    public function test_parse_var_primitive_array()
+    {
+        $comment = '
             /**
              * foo, bar, baz
              *
              * @var float[]
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(1, $annotations['vars']);
         $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals('float[]', $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_var_builtin_class() {
-        $comment = "
+    public function test_parse_var_builtin_class()
+    {
+        $comment = '
             /**
              * foo, bar, baz
              *
              * @var DateInterval
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(1, $annotations['vars']);
         $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals(\DateInterval::class, $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_var_custom_class_array() {
-        $comment = "
+    public function test_parse_var_custom_class_array()
+    {
+        $comment = '
             /**
              * foo, bar, baz
              *
              * @var Update[]
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
         $factory = new AnnotationConverter($uses);
         $annotations = $factory->parse($comment, '');
-        
+
         $this->assertCount(1, $annotations['vars']);
         $this->assertInstanceOf(ColumnType::class, $annotations['vars'][0]);
         $this->assertEquals(Update::class . '[]', $annotations['vars'][0]->type);
 
         $this->assertCount(0, $annotations['params']);
         $this->assertCount(0, $annotations['returns']);
-     }
-     
+    }
+
     /**
      * @test
      */
-     public function test_parse_var_duplicated() {
-        $comment = "
+    public function test_parse_var_duplicated()
+    {
+        $comment = '
             /**
              * foo, bar, baz
              *
              * @var Update[]
              * @var bool
              */
-        ";
-        
+        ';
+
         $uses = [
             'Omelet\Tests\Target',
             'Omelet\Annotation',
             __NAMESPACE__,
-            
+
         ];
 
         $factory = new AnnotationConverter($uses);
         try {
             $factory->parse($comment, '');
-            
+
             $this->fail();
         }
         catch (\Exception $ex) {
             if ($ex instanceof PHPUnit_Framework_AssertionFailedError) {
                 throw $ex;
             }
-            
+
             $this->assertInstanceOf(AnnotationException::class, $ex);
         }
     }

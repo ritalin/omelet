@@ -2,12 +2,16 @@
 
 namespace Omelet\Tests\Target;
 
+use Omelet\Annotation\Dao;
+use Omelet\Annotation\Select;
+
 /**
  * @Dao(route="/")
  */
-interface SwitchDao {
+interface SwitchDao
+{
     /**
      * @Select
      */
-    function findB();
+    public function findB();
 }

@@ -2,23 +2,21 @@
 
 namespace Omelet\Annotation;
 
-use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 
-use Omelet\Annotation\Core\DaoAnnotation;
-
 /**
- * Column
+ * Column.
  *
  * @Annotation
  * @Target("PROPERTY")
  */
-final class Column implements Core\EntityFieldAnnotation {
-	/**
-	 * @var string
-	 */
+final class Column implements Core\EntityFieldAnnotation
+{
+    /**
+     * @var string
+     */
     public $alias;
-    
+
     /**
      * @var mixed
      */
@@ -29,12 +27,13 @@ final class Column implements Core\EntityFieldAnnotation {
      */
     public $optFields = [];
 
-    public static function __set_state($values) {
-        $a = new self;
+    public static function __set_state($values)
+    {
+        $a = new self();
         $a->alias = $values['alias'];
         $a->default = $values['default'];
         $a->optFields = $values['optFields'];
-        
+
         return $a;
     }
 }

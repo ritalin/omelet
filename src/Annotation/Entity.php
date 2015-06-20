@@ -5,13 +5,12 @@ namespace Omelet\Annotation;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 
-use Omelet\Annotation\Core\DaoAnnotation;
-
 /**
- * Entity
+ * Entity.
  *
  * @Annotation
  * @Target("CLASS")
  */
-final class Entity {
+final class Entity
+{
 }

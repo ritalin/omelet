@@ -3,52 +3,52 @@
 namespace Omelet\Tests\Target;
 
 use Omelet\Annotation\Dao;
-use Omelet\Annotation\Select;
-use Omelet\Annotation\Insert;
-use Omelet\Annotation\Update;
 use Omelet\Annotation\Delete;
+use Omelet\Annotation\Insert;
+use Omelet\Annotation\Select;
+use Omelet\Annotation\Update;
 
 use Omelet\Annotation\ParamAlt;
 
 /**
  * @Dao
  */
-
-interface TodoDao {
+interface TodoDao
+{
     /**
      * @Select
      */
-    function listAll();
+    public function listAll();
     /**
      * @Select
      */
-    function listById($id);
+    public function listById($id);
     /**
      * @Select
      *
      * @param \DateTime from
      * @param \DateTime to
      */
-    function listByPub(\DateTime $from, \DateTime $to);
-    
+    public function listByPub(\DateTime $from, \DateTime $to);
+
     /**
      * @Insert
      *
      * @param string[] fields
      */
-    function insert(array $fields);
-    
+    public function insert(array $fields);
+
     /**
      * @Update
      *
      * @param string[] fields
      */
-    function update(array $fields);
-    
+    public function update(array $fields);
+
     /**
      * @Delete
      *
      * @param int id
      */
-    function delete($id);
+    public function delete($id);
 }

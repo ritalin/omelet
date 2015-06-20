@@ -2,4 +2,6 @@
 
 namespace Omelet\Annotation\Core;
 
-interface DaoAnnotation {}
+interface DaoAnnotation
+{
+}

@@ -2,128 +2,137 @@
 
 namespace Omelet\Tests\Target;
 
-use Omelet\Annotation\Select;
-use Omelet\Annotation\Insert;
-
 use Omelet\Annotation\Dao;
 use Omelet\Annotation\ParamAlt;
 use Omelet\Annotation\Returning;
 
+use Omelet\Annotation\Insert;
+use Omelet\Annotation\Select;
+
 /**
  * @Dao(route="/")
  */
-interface TodoDao2 {
+interface TodoDao2
+{
     /**
      * @Select
      *
      * @param PrimaryKey key
      */
-    function listById(PrimaryKey $key);
-    
+    public function listById(PrimaryKey $key);
+
     /**
      * @Select
      *
-     * @return Todo[] 
+     * @return Todo[]
      */
-    function listAll();
-    
+    public function listAll();
+
     /**
      * @Select
      *
      * @return array
      */
-    function listAllAsRawArray();
-    
+    public function listAllAsRawArray();
+
     /**
      * @Select
      *
      * @return integer
      */
-    function listAllReturningTopLeft();
-    
+    public function listAllReturningTopLeft();
+
     /**
      * @Select
      *
      * @param DateTime from
      * @param DateTime to
-     * @return Todo[] 
+     *
+     * @return Todo[]
      */
-    function listByPub(\DateTime $from, \DateTime $to);
+    public function listByPub(\DateTime $from, \DateTime $to);
 
     /**
      * @Select
      *
      * @param PrimaryKey key
+     *
      * @return Todo
      */
-    function findById(PrimaryKey $key);
+    public function findById(PrimaryKey $key);
 
     /**
      * @Select
      *
      * @param PrimaryKey key
+     *
      * @return Todo
      */
-    function findByIdReturningEntityWithDomain(PrimaryKey $key);
+    public function findByIdReturningEntityWithDomain(PrimaryKey $key);
 
     /**
      * @Select
      *
      * @param PrimaryKey key
+     *
      * @return Todo
      */
-    function findByIdReturningAlias(PrimaryKey $key);
+    public function findByIdReturningAlias(PrimaryKey $key);
 
     /**
      * @Select
      *
      * @param PrimaryKey key
+     *
      * @return Todo
      */
-    function findByIdReturningEditorKeyOnly(PrimaryKey $key);
+    public function findByIdReturningEditorKeyOnly(PrimaryKey $key);
 
     /**
      * @Select
      *
      * @param PrimaryKey key
+     *
      * @return Todo
      */
-    function findByIdReturningEditor(PrimaryKey $key);
-    
+    public function findByIdReturningEditor(PrimaryKey $key);
+
     /**
      * @Select
      *
      * @param int key
+     *
      * @return bool
      */
-    function exists($id);
-    
+    public function exists($id);
+
     /**
      * @Select
      *
      * @param int key
+     *
      * @return Existance
      */
-    function existsAsDomain($id);
-    
+    public function existsAsDomain($id);
+
     /**
      * @Select
      *
      * @return int[]
      */
-    function primaryKeysDesc();
-    
+    public function primaryKeysDesc();
+
     /**
      * @Select
      *
      * @return PrimaryKey[]
      */
-    function primaryKeysDescAsDomain();
-    
+    public function primaryKeysDescAsDomain();
+
     /**
      * @Insert
      *
      * @param Todo entity
      */
-    function insert(Todo $entity);
+    public function insert(Todo $entity);
 }

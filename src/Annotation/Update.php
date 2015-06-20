@@ -6,9 +6,11 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 
 /**
- * Update
+ * Update.
  *
  * @Annotation
  * @Target("METHOD")
  */
-final class Update implements Core\DaoAnnotation {}
+final class Update implements Core\DaoAnnotation
+{
+}

@@ -21,20 +21,20 @@ use Omelet\Domain\ArrayDomain;
 use Omelet\Domain\ComplexDomain;
 
 use Omelet\Util\CaseSensor;
-;
 
-class DaoBuilder {
+class DaoBuilder
+{
     /**
-     * @var \ReflectionClass 
+     * @var \ReflectionClass
      */
     private $intf;
     /**
-     * @var string 
+     * @var string
      */
     private $className;
-    
+
     private $methods = [];
-    
+
     /**
      * @var string[]
      */
@@ -43,7 +43,7 @@ class DaoBuilder {
      * @var DomainFactory
      */
     private $factory;
-    
+
     /**
      * @var CaseSensor
      */
@@ -52,70 +52,82 @@ class DaoBuilder {
      * @var CaseSensor
      */
     private $returnCaseSensor;
-    
-    
-    public function __construct(\ReflectionClass $intf, $className) {
+
+    public function __construct(\ReflectionClass $intf, $className)
+    {
         $this->intf = $intf;
         $this->className = $className;
         $this->factory = new DomainFactory();
         $this->paramCaseSensor = $this->returnCaseSensor = CaseSensor::LowerSnake();
     }
-    
-    public function getInterfaceName() {
+
+    public function getInterfaceName()
+    {
         return $this->intf->name;
     }
-    
-    public function getClassName() {
+
+    public function getClassName()
+    {
         return $this->className;
     }
-    
-    public function getMethods() {
+
+    public function getMethods()
+    {
         return $this->methods;
     }
-    
-    public function getConfig() {
+
+    public function getConfig()
+    {
         return $this->config;
     }
-    
-    public function getParamCaseSensor() {
+
+    public function getParamCaseSensor()
+    {
         return $this->paramCaseSensor;
     }
-    public function setParamCaseSensor($sensor) {
+
+    public function setParamCaseSensor($sensor)
+    {
         if ($sensor === null) return;
-        
+
         $this->paramCaseSensor = $sensor;
     }
-    
-    public function getReturnCaseSensor() {
+
+    public function getReturnCaseSensor()
+    {
         return $this->returnCaseSensor;
     }
-    public function setReturnCaseSensor($sensor) {
+
+    public function setReturnCaseSensor($sensor)
+    {
         if ($sensor === null) return;
-        
+
         $this->returnCaseSensor = $sensor;
     }
-    
-    private function extractAnnotation(array $attrs, $class) {
+
+    private function extractAnnotation(array $attrs, $class)
+    {
         $results = array_filter(
             $attrs,
-            function ($a) use($class) {
+            function ($a) use ($class) {
                 return ($a instanceof $class);
             }
         );
-        
+
         return array_shift($results);
     }
-    
-    public function prepare() {
+
+    public function prepare()
+    {
         $reader = new AnnotationReader();
 
         $commentParser = new AnnotationConverterAdapter($this->intf);
-        
+
         $this->config = $this->extractDaoClassConfig($commentParser->getClassAnnotations());
-        
+
         $this->methods = array_reduce(
             $this->intf->getMethods(),
-            function (array &$tmp, \ReflectionMethod $m) use($reader, $commentParser) {
+            function (array &$tmp, \ReflectionMethod $m) use ($reader, $commentParser) {
                 $attrs = $commentParser->getMethodAnnotations($m);
 
                 return $tmp + [$m->name => [
@@ -129,10 +141,11 @@ class DaoBuilder {
             []
         );
     }
-    
-    private function extractDaoClassConfig(array $annotations) {
+
+    private function extractDaoClassConfig(array $annotations)
+    {
         $config = [];
-        
+
         $a = $this->extractAnnotation($annotations, Dao::class);
         if (isset($a)) {
             foreach ($a as $field => $value) {
@@ -141,17 +154,18 @@ class DaoBuilder {
         }
         return $config;
     }
-    
-    private function paramToDomain(array $params, array $attrs, AnnotationReader $reader) {
+
+    private function paramToDomain(array $params, array $attrs, AnnotationReader $reader)
+    {
         $paramDefs = $this->extractParamDefs($attrs);
-        
+
         $domains = array_reduce(
             $params,
-            function (&$tmp, \ReflectionParameter $p) use($reader, $paramDefs) {
-                if ((isset($paramDefs[$p->name])) ) {
+            function (&$tmp, \ReflectionParameter $p) use ($reader, $paramDefs) {
+                if (isset($paramDefs[$p->name])) {
                     $t = $paramDefs[$p->name];
                 }
-                else if ($p->getClass() !== null) {
+                elseif ($p->getClass() !== null) {
                     $t = $p->getClass()->name;
                 }
                 else {
@@ -162,27 +176,29 @@ class DaoBuilder {
             },
             []
         );
-        
+
         return new ComplexDomain($domains);
     }
-    
-    private function returningToDomain(array $attrs, AnnotationReader $reader) {
+
+    private function returningToDomain(array $attrs, AnnotationReader $reader)
+    {
         if ($this->extractAnnotation($attrs, Select::class) !== null) {
             $returning = $this->extractAnnotation($attrs, Returning::class);
-            
+
             return $this->factory->parse('', isset($returning) ? $returning->type : 'array', $this->returnCaseSensor);
         }
         else {
             return $this->factory->parse('', 'int', $this->returnCaseSensor);
         }
     }
-    
-    private function extractParamDefs(array $attrs) {
+
+    private function extractParamDefs(array $attrs)
+    {
         $defs = array_filter(
             $attrs,
             function ($a) { return $a instanceof ParamAlt; }
         );
-        
+
         return array_reduce(
             $defs,
             function (array &$tmp, $d) {
@@ -191,8 +207,9 @@ class DaoBuilder {
             []
         );
     }
-    
-    public function export($return = false) {
+
+    public function export($return = false)
+    {
         $classDef = $this->classTemplate();
         $methodDefs = array_map(
             function (array $m) {
@@ -200,40 +217,42 @@ class DaoBuilder {
             },
             $this->methods
         );
-        
+
         $def = sprintf($classDef, implode("\n", $methodDefs));
-        
+
         if ($return) {
             return $def;
         }
         else {
             echo $def;
+
             return null;
         }
     }
-    
-    private function classTemplate() {
+
+    private function classTemplate()
+    {
         $className = $this->getClassName();
-        
+
         $p = strrpos($className, '\\');
         $ns = substr($className, 0, $p);
-        $name = substr($className, $p+1);
-        
+        $name = substr($className, $p + 1);
+
         $accessRoute = array_merge(
-            preg_split('/[\/\\\\]/', ($this->config['route'] !== '') ? $this->config['route'] : $ns), 
+            preg_split('/[\/\\\\]/', ($this->config['route'] !== '') ? $this->config['route'] : $ns),
             [$this->intf->getShortName()]
         );
         $accessRoute = implode(DIRECTORY_SEPARATOR, $accessRoute);
-        
+
         if ($ns !== '') {
             $ns = "namespace {$ns};";
         }
-        
-        return 
+
+        return
 "<?php
 
 $ns
-/// Auto-generated class 
+/// Auto-generated class
 
 use Omelet;
 use Omelet\Core\DaoBase;
@@ -243,33 +262,35 @@ use Doctrine\DBAL\Driver\Connection;
 
 class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
     const AccessRoute = '{$accessRoute}';
-    
+
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
         parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'));
     }
-    
+
 %s
 }
 "
          ;
     }
-    
-    private function extractTypeHint(\ReflectionParameter $p) {
+
+    private function extractTypeHint(\ReflectionParameter $p)
+    {
         $hint = $p->getClass();
-        
+
         if (isset($hint)) {
             return "\\{$hint->name} ";
         }
-        else if ($p->isArray()) {
-            return "array ";
+        elseif ($p->isArray()) {
+            return 'array ';
         }
         else {
-            return "";
+            return '';
         }
     }
-    
-    private function methodTemplate(array $method) {
-        $paramDefs = implode(', ', 
+
+    private function methodTemplate(array $method)
+    {
+        $paramDefs = implode(', ',
             array_map(
                 function (\ReflectionParameter $p) {
                     return $this->extractTypeHint($p) . "\${$p->name}";
@@ -280,7 +301,8 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
 
         $methodName = $method['name'];
         $domain = var_export($method['paramDomain'], true);
-        $params = implode(', ', 
+        $params = implode(
+            ', ',
             array_map(
                 function (\ReflectionParameter $p) {
                     return "'{$p->name}' => \${$p->name}";
@@ -289,33 +311,32 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             )
         );
         $returning = var_export($method['returnDomain'], true);
-        
+
         switch (get_class($method['type'])) {
-        case Select::class:
-            $class = ArrayDomain::class;
-            if ($method['returnDomain'] instanceof $class) {
-                $caller = "fetchAll";
-            }
-            else {
-                $caller = "fetchRow";
-            }
-            break;
-        default:
-            $caller = "execute";
-            break;
+            case Select::class:
+                $class = ArrayDomain::class;
+                if ($method['returnDomain'] instanceof $class) {
+                    $caller = 'fetchAll';
+                }
+                else {
+                    $caller = 'fetchRow';
+                }
+                break;
+            default:
+                $caller = 'execute';
+                break;
         }
-        
-        return 
+
+        return
 "    public function {$methodName}({$paramDefs}) {
         \$paramDomain = {$domain};
         \$params = [$params];
         \$returnDomain = {$returning};
-        
+
         \$rows = \$this->{$caller}('$methodName', \$paramDomain->expandValues('', \$params), \$paramDomain->expandTypes('', \$params));
-        
+
         return \$this->convertResults(\$rows, \$returnDomain);
     }"
-
         ;
     }
 }
