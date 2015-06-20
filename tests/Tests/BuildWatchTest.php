@@ -1,6 +1,6 @@
 <?php
 
-namespace OmeletTests;
+namespace Omelet\Tests;
 
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\SwitchDao;
@@ -9,7 +9,7 @@ use Omelet\Watch\WatchMode;
 
 class BuildWatchTest extends \PHPUnit_Framework_TestCase
 {
-    const daoRoot = __DIR__ . '/fixtures/exports';
+    const daoRoot = __DIR__ . '/../fixtures/exports';
     /**
      * @test
      */
@@ -216,7 +216,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase
         $w = new ChangeWatcher(self::daoRoot, WatchMode::Whenever());
         $this->modifyDao();
         $w->clear();
-        $route = __DIR__ . '/fixtures/sql/SwitchDao';
+        $route = basename(__DIR__) . '/fixtures/sql/SwitchDao';
         $this->modifySql($route);
         $this->assertTrue($w->sqlOutdated($route));
         $w->save(true);

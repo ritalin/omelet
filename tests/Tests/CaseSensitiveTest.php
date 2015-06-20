@@ -1,6 +1,6 @@
 <?php
 
-namespace OmeletTest;
+namespace Omelet\Tests;
 
 use Omelet\Util\CaseSensor;
 

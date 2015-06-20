@@ -1,6 +1,6 @@
 <?php
 
-namespace OmeletTests;
+namespace Omelet\Tests;
 
 use Omelet\Annotation\AnnotationConverter;
 use Omelet\Annotation\Returning;

@@ -1,6 +1,6 @@
 <?php
 
-namespace OmeletTests;
+namespace Omelet\Tests;
 
 use Omelet\Builder\Configuration;
 use Omelet\Builder\DaoBuilderContext;

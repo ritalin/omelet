@@ -1,6 +1,6 @@
 <?php
 
-namespace OmeletTests;
+namespace Omelet\Tests;
 
 use Doctrine\DBAL\Logging\SQLLogger;
 use Doctrine\Common\Annotations\AnnotationReader;
