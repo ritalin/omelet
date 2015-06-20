@@ -26,6 +26,11 @@ class DaoBuilderContext
 
         $this->watcher = new ChangeWatcher($this->config->daoClassPath, WatchMode::{$this->config->watchMode}());
 
+        $this->registerClassLoader();
+    }
+
+    private function registerClassLoader()
+    {
         $loader = new ClassLoader();
         $loader->addPsr4('', $this->config->daoClassPath);
         $loader->register();
@@ -116,5 +121,10 @@ class DaoBuilderContext
     public function getConfig()
     {
         return $this->config;
+    }
+
+    public function __wakeup()
+    {
+        $this->registerClassLoader();
     }
 }

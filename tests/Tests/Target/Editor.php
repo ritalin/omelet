@@ -21,4 +21,9 @@ class Editor extends CustomDomain
     {
         return $this->getOptValue('name');
     }
+
+    public function name()
+    {
+        return $this->getOptValue('name');
+    }
 }

@@ -29,7 +29,7 @@ abstract class CustomDomain extends DomainBase
     {
         $this->type = $type;
         $this->value = $value;
-        $this->optValues = $optValues;
+        $this->optValues = array_merge(['value' => $value], $optValues);
     }
 
     /**
