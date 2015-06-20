@@ -1,6 +1,6 @@
 <?php
 
-namespace Omelet\Tests\Target;
+namespace Omelet\Tests\Target\SwitchDao;
 
 use Omelet\Annotation\Dao;
 use Omelet\Annotation\Select;

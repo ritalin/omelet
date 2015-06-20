@@ -3,7 +3,7 @@
 namespace Omelet\Tests;
 
 use Omelet\Tests\Target\TodoDao;
-use Omelet\Tests\Target\SwitchDao;
+use Omelet\Tests\Target\SwitchDao\SwitchDao;
 use Omelet\Watch\ChangeWatcher;
 use Omelet\Watch\WatchMode;
 
@@ -39,7 +39,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase
     }
     private function modifyDao()
     {
-        $daoFile = __DIR__ . '/Target/SwitchDao';
+        $daoFile = __DIR__ . '/Target/SwitchDao/SwitchDao';
         $lockFile = self::daoRoot . '/lockDao';
         if (file_exists("{$lockFile}_1")) {
             $from = 1;

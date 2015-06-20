@@ -4,4 +4,4 @@ composer.lock
 tests/fixtures/exports/
 tests/fixtures/todo.sqlite3
 tests/fixtures/sql/SwitchDao/*.sql
-tests/Tests/Target/SwitchDao.php
+tests/Tests/Target/SwitchDao/SwitchDao.php

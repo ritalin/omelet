@@ -1,7 +1,10 @@
 <?php
 $finder = Symfony\CS\Finder\DefaultFinder::create()
 ->in(__DIR__)
-->exclude('tests/fixtures/exports');
+->exclude([
+    'tests/fixtures/exports',
+    'tests/Tests/Target/SwitchDao',
+]);
 
 $config = Symfony\CS\Config\Config::create()
 ->level(Symfony\CS\FixerInterface::PSR2_LEVEL)
