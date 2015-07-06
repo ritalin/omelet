@@ -504,6 +504,20 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function test_export_select_returning_entity_but_without_result()
+    {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+
+        $results = $dao->findById(new PrimaryKey(987));
+
+        $this->assertNull($results);
+    }
+
+    /**
+     * @test
+     */
     public function test_export_select_returning_entity_array()
     {
         $logger = null;
@@ -524,6 +538,19 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $row->id);
         $this->assertEquals('bbb', $row->todo);
         $this->assertEquals(new \DateTime('2015/05/11'), $row->created);
+    }
+
+    /**
+     * @test
+     */
+    public function test_export_select_returning_entity_array_but_without_results()
+    {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+
+        $results = $dao->listByPub(new \DateTime('2010/4/30'), new \DateTime('2010/5/11'));
+        $this->assertCount(0, $results);
     }
 
     /**
