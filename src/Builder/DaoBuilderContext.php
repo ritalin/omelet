@@ -100,7 +100,7 @@ class DaoBuilderContext
     /**
      * @param string intfName
      */
-    public function build($intfName, SequenceNameStrategyInterface $strategy)
+    public function build($intfName)
     {
         $classPath = $this->config->daoClassPath;
         $className = $this->getDaoClassName($intfName);
@@ -112,7 +112,7 @@ class DaoBuilderContext
 
         $ref = new \ReflectionClass($intfName);
         if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->sqlOutdated($className::AccessRoute)) {
-            $builder = new DaoBuilder($ref, $className, $strategy);
+            $builder = new DaoBuilder($ref, $className);
             $builder->setParamCaseSensor(CaseSensor::{$this->config->paramCaseSensor}());
             $builder->setReturnCaseSensor(CaseSensor::{$this->config->returnCaseSensor}());
 
