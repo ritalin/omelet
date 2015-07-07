@@ -7,23 +7,40 @@ use Omelet\Domain\DomainBase;
 
 class DaoBase
 {
+    /**
+     * @var Connection
+     */
     private $conn;
+    /**
+     * @var string[]
+     */
     private $queries;
+    /**
+     * @var string
+     */
+    private $seqName;
 
-    public function __construct(Connection $conn, array $queries)
+    public function __construct(Connection $conn, array $queries, $seqName)
     {
         $this->conn = $conn;
         $this->queries = $queries;
+        $this->seqName = $seqName;
     }
     
     /**
-     * @param string sequenceName
-     *
      * @return string
      */
-    protected function lastInsertIdInternal($sequenceName)
+    public function sequenceName()
     {
-        return $this->conn->lastInsertId($sequenceName);
+        return $this->seqName;
+    }
+    
+    /**
+     * @return string
+     */
+    public function lastInsertId()
+    {
+        return $this->conn->lastInsertId($this->seqName);
     }
     
     protected function fetchAll($key, array $params, array $types)

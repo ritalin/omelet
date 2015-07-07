@@ -4,7 +4,7 @@ namespace Omelet\Annotation;
 
 /**
  * @Annotation
- * @Target("METHOD")
+ * @Target("CLASS")
 
  */
 class SequenceHint
@@ -27,4 +27,14 @@ class SequenceHint
      * @var $name
      */
     public $name;
+    
+    public static function __set_state(array $values)
+    {
+        $result = new SequenceHint();
+        $result->table = $values['table'];
+        $result->column = $values['column'];
+        $result->name = $values['name'];
+        
+        return $result;
+    }
 }

@@ -42,6 +42,12 @@ class DaoBuilder
      * @var string[]
      */
     private $config = [];
+
+    /**
+     * @var SequenceHint
+     */
+    private $seqHint;
+
     /**
      * @var DomainFactory
      */
@@ -56,21 +62,10 @@ class DaoBuilder
      */
     private $returnCaseSensor;
     
-    /**
-     * @var string
-     */
-    private $seqName;
-    
-    /**
-     * @var SequenceNameStrategyInterface
-     */
-    private $sequenceStrategy;
-    
-    public function __construct(\ReflectionClass $intf, $className, SequenceNameStrategyInterface $strategy)
+    public function __construct(\ReflectionClass $intf, $className)
     {
         $this->intf = $intf;
         $this->className = $className;
-        $this->sequenceStrategy = $strategy;
         
         $this->factory = new DomainFactory();
         $this->paramCaseSensor = $this->returnCaseSensor = CaseSensor::LowerSnake();
@@ -140,11 +135,7 @@ class DaoBuilder
         
         $annotations = $commentParser->getClassAnnotations();
         $this->config = $this->extractDaoClassConfig($annotations);
-        
-        $seq = $this->sequenceStrategy->resolve(
-            $this->extractAnnotation($annotations, SequenceHint::class)
-        );
-        $this->seqName = empty($seq) ? 'null' : "'$seq'";
+        $this->seqHint = $this->extractAnnotation($annotations, SequenceHint::class);
         
         $this->methods = array_reduce(
             $this->intf->getMethods(),
@@ -268,7 +259,9 @@ class DaoBuilder
         if ($ns !== '') {
             $ns = "namespace {$ns};";
         }
-
+        
+        $seqHint = var_export($this->seqHint, true);
+        
         return
 "<?php
 
@@ -284,19 +277,19 @@ use Doctrine\DBAL\Driver\Connection;
 class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
     const AccessRoute = '{$accessRoute}';
     
-    private \$seqName = {$this->seqName};
-    
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
-        parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'));
-    }
-    
-    public function lastInsertId() {
-        return \$this->lastInsertIdInternal(\$this->seqName);
+        \$hint = {$seqHint};
+        \$seq = \$context
+            ->getSequenceNameManager()
+            ->findStrategy(\$conn->getDriver()->getName())
+            ->resolve(\$hint);
+        
+        parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'), empty(\$seq) ? null : \$seq);
     }
 %s
 }
 "
-         ;
+        ;
     }
 
     private function extractTypeHint(\ReflectionParameter $p)

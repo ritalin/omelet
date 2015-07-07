@@ -19,6 +19,7 @@ use Omelet\Util\CaseSensor;
 
 use Omelet\Tests\Target\TodoDao;
 use Omelet\Tests\Target\TodoDao2;
+use Omelet\Tests\Target\TodoDao3;
 use Omelet\Tests\Target\ConstDao;
 use Omelet\Tests\Target\Existance;
 use Omelet\Tests\Target\PrimaryKey;
@@ -38,8 +39,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(
-            new \ReflectionClass(TodoDao::class), $context->getDaoClassName(TodoDao::class), 
-            new DefaultSequenceStrategy()
+            new \ReflectionClass(TodoDao::class), $context->getDaoClassName(TodoDao::class)
         );
 
         $this->assertEquals('Omelet\Tests\Target\TodoDao', $builder->getInterfaceName());
@@ -169,8 +169,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
         }
         $context = new DaoBuilderContext($config);
         $builder = new DaoBuilder(
-            new \ReflectionClass($intf), $context->getDaoClassName($intf), new DefaultSequenceStrategy(),
-            new DefaultSequenceStrategy()
+            new \ReflectionClass($intf), $context->getDaoClassName($intf)
         );
 
         $builder->prepare();
@@ -360,8 +359,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(
-            new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class),
-            new DefaultSequenceStrategy()
+            new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class)
         );
 
         $factory = new DomainFactory();
@@ -601,8 +599,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(
-            new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class),
-            new DefaultSequenceStrategy()
+            new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class)
         );
 
         $factory = new DomainFactory();
@@ -710,8 +707,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
         ));
         $builder = new DaoBuilder(
-            new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class),
-            new DefaultSequenceStrategy()
+            new \ReflectionClass(TodoDao2::class), $context->getDaoClassName(TodoDao2::class)
         );
 
         $factory = new DomainFactory();
@@ -807,5 +803,19 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals('CreatorId', $children['creator']->getAlias());
             $this->assertEquals(['CreatorName'], $children['creator']->getOptFields());
         }
+    }
+    
+    /**
+     * @test
+     */
+    public function test_sequence_name()
+    {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(TodoDao2::class, $logger);
+        $this->assertNull($dao->sequenceName());
+        
+        $dao = $this->exportDao(TodoDao3::class, $logger);
+        $this->assertEquals('todo', $dao->sequenceName());
     }
 }
