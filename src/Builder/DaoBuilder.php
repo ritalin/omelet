@@ -11,6 +11,7 @@ use Omelet\Annotation\Core\DaoAnnotation;
 use Omelet\Annotation\AnnotationConverterAdapter;
 
 use Omelet\Annotation\ParamAlt;
+use Omelet\Annotation\SequenceHint;
 
 use Omelet\Annotation\Dao;
 use Omelet\Annotation\Select;
@@ -19,6 +20,8 @@ use Omelet\Annotation\Returning;
 use Omelet\Domain\DomainFactory;
 use Omelet\Domain\ArrayDomain;
 use Omelet\Domain\ComplexDomain;
+
+use Omelet\Sequence\SequenceNameStrategyInterface;
 
 use Omelet\Util\CaseSensor;
 
@@ -52,11 +55,23 @@ class DaoBuilder
      * @var CaseSensor
      */
     private $returnCaseSensor;
-
-    public function __construct(\ReflectionClass $intf, $className)
+    
+    /**
+     * @var string
+     */
+    private $seqName;
+    
+    /**
+     * @var SequenceNameStrategyInterface
+     */
+    private $sequenceStrategy;
+    
+    public function __construct(\ReflectionClass $intf, $className, SequenceNameStrategyInterface $strategy)
     {
         $this->intf = $intf;
         $this->className = $className;
+        $this->sequenceStrategy = $strategy;
+        
         $this->factory = new DomainFactory();
         $this->paramCaseSensor = $this->returnCaseSensor = CaseSensor::LowerSnake();
     }
@@ -122,9 +137,15 @@ class DaoBuilder
         $reader = new AnnotationReader();
 
         $commentParser = new AnnotationConverterAdapter($this->intf);
-
-        $this->config = $this->extractDaoClassConfig($commentParser->getClassAnnotations());
-
+        
+        $annotations = $commentParser->getClassAnnotations();
+        $this->config = $this->extractDaoClassConfig($annotations);
+        
+        $seq = $this->sequenceStrategy->resolve(
+            $this->extractAnnotation($annotations, SequenceHint::class)
+        );
+        $this->seqName = empty($seq) ? 'null' : "'$seq'";
+        
         $this->methods = array_reduce(
             $this->intf->getMethods(),
             function (array &$tmp, \ReflectionMethod $m) use ($reader, $commentParser) {
@@ -262,11 +283,16 @@ use Doctrine\DBAL\Driver\Connection;
 
 class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
     const AccessRoute = '{$accessRoute}';
-
+    
+    private \$seqName = {$this->seqName};
+    
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
         parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'));
     }
-
+    
+    public function lastInsertId() {
+        return \$this->lastInsertIdInternal(\$this->seqName);
+    }
 %s
 }
 "

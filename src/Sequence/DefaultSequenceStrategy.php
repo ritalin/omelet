@@ -9,7 +9,7 @@ class DefaultSequenceStrategy implements SequenceNameStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(SequenceHint $hint)
+    public function resolve(SequenceHint $hint = null)
     {
         if ($hint !== null) {
             if ($hint->name !== null) {

@@ -11,5 +11,5 @@ interface SequenceNameStrategyInterface
      *
      * @return string
      */
-    public function resolve(SequenceHint $hint);
+    public function resolve(SequenceHint $hint = null);
 }

@@ -15,7 +15,17 @@ class DaoBase
         $this->conn = $conn;
         $this->queries = $queries;
     }
-
+    
+    /**
+     * @param string sequenceName
+     *
+     * @return string
+     */
+    protected function lastInsertIdInternal($sequenceName)
+    {
+        return $this->conn->lastInsertId($sequenceName);
+    }
+    
     protected function fetchAll($key, array $params, array $types)
     {
         return $this->conn->fetchAll($this->queries[$key], $params, $types);

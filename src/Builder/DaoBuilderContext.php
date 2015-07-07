@@ -5,6 +5,8 @@ namespace Omelet\Builder;
 use Composer\Autoload\ClassLoader;
 use Omelet\Watch\ChangeWatcher;
 use Omelet\Watch\WatchMode;
+use Omelet\Sequence\SequenceNameManager;
+use Omelet\Sequence\SequenceNameStrategyInterface;
 use Omelet\Util\CaseSensor;
 
 class DaoBuilderContext
@@ -18,6 +20,11 @@ class DaoBuilderContext
      * @var ChangeWatcher
      */
     private $watcher;
+    
+    /**
+     * @var SequenceNameManager
+     */
+    private $sequenceManager;
 
     public function __construct(Configuration $config)
     {
@@ -25,7 +32,8 @@ class DaoBuilderContext
         $this->config->validate();
 
         $this->watcher = new ChangeWatcher($this->config->daoClassPath, WatchMode::{$this->config->watchMode}());
-
+        $this->sequenceManager = new SequenceNameManager();
+        
         $this->registerClassLoader();
     }
 
@@ -59,6 +67,10 @@ class DaoBuilderContext
         return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
     }
 
+    public function getSequenceNameManager()
+    {
+        return $this->sequenceManager;
+    }
     /**
      * @param string intfName
      */
@@ -88,7 +100,7 @@ class DaoBuilderContext
     /**
      * @param string intfName
      */
-    public function build($intfName)
+    public function build($intfName, SequenceNameStrategyInterface $strategy)
     {
         $classPath = $this->config->daoClassPath;
         $className = $this->getDaoClassName($intfName);
@@ -100,7 +112,7 @@ class DaoBuilderContext
 
         $ref = new \ReflectionClass($intfName);
         if ($this->watcher->outdated($ref->getFileName()) || $this->watcher->sqlOutdated($className::AccessRoute)) {
-            $builder = new DaoBuilder($ref, $className);
+            $builder = new DaoBuilder($ref, $className, $strategy);
             $builder->setParamCaseSensor(CaseSensor::{$this->config->paramCaseSensor}());
             $builder->setReturnCaseSensor(CaseSensor::{$this->config->returnCaseSensor}());
 
