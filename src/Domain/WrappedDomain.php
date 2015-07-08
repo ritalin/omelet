@@ -3,6 +3,7 @@
 namespace Omelet\Domain;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Omelet\Util\CaseSensor;
 
 class WrappedDomain extends DomainBase
 {
@@ -26,14 +27,14 @@ class WrappedDomain extends DomainBase
         return $this->type;
     }
 
-    protected function expandTypesInternal($name, $val)
+    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
     {
-        return ($val instanceof CustomDomain) ? $val->expandTypes($name, $val, false) : [];
+        return ($val instanceof CustomDomain) ? $val->expandTypes($name, $val, $sensor, false) : [];
     }
 
-    protected function expandValuesInternal($name, $val)
+    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
     {
-        return ($val instanceof CustomDomain) ? $val->expandValues($name, $val, false) : [];
+        return ($val instanceof CustomDomain) ? $val->expandValues($name, $val, $sensor, false) : [];
     }
 
     protected function convertResultsInternal($results, AbstractPlatform $platform)

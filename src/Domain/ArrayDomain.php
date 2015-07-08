@@ -5,43 +5,48 @@ namespace Omelet\Domain;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
+use Omelet\Util\CaseSensor;
+
 class ArrayDomain extends DomainBase
 {
+    /**
+     * @var DomainBase
+     */
     private $child;
-
+    
     public function __construct(DomainBase $child)
     {
         $this->child = $child;
     }
 
-    protected function expandTypesInternal($name, $val)
+    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
     {
         if (is_array($val) && count($val) === 0) {
             return [];
         }
 
-        return $this->expand($name, $val,
-            function ($k, $v) { return $this->child->expandTypes($k, $v); }
+        return $this->expand($name, $val, $sensor,
+            function ($k, $v) use ($sensor) { return $this->child->expandTypes($k, $v, $sensor); }
         );
     }
 
-    protected function expandValuesInternal($name, $val)
+    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
     {
         if (is_array($val) && count($val) === 0) {
             return [];
         }
 
-        return $this->expand($name, $val,
-            function ($k, $v) { return $this->child->expandValues($k, $v); }
+        return $this->expand($name, $val, $sensor,
+            function ($k, $v) use ($sensor) { return $this->child->expandValues($k, $v, $sensor); }
         );
     }
 
-    private function expand($name, $val, callable $fn)
+    private function expand($name, $val, CaseSensor $sensor, callable $fn)
     {
         return array_reduce(
             array_keys($val),
-            function (array &$tmp, $k) use ($name, $val, $fn) {
-                $n = $name !== '' ? "{$name}_{$k}" : $k;
+            function (array &$tmp, $k) use ($name, $val, $sensor, $fn) {
+                $n = $name !== '' ? $sensor->convert($name, $k) : $k;
 
                 return $tmp + [$k => $fn($n, $val[$k])];
             },

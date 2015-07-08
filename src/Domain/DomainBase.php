@@ -3,23 +3,24 @@
 namespace Omelet\Domain;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Omelet\Util\CaseSensor;
 
 abstract class DomainBase
 {
-    abstract protected function expandTypesInternal($name, $val);
-    abstract protected function expandValuesInternal($name, $val);
+    abstract protected function expandTypesInternal($name, $val, CaseSensor $sensor);
+    abstract protected function expandValuesInternal($name, $val, CaseSensor $sensor);
     abstract protected function convertResultsInternal($results, AbstractPlatform $platform);
 
-    public function expandTypes($name, $val, $root = true)
+    public function expandTypes($name, $val, CaseSensor $sensor, $root = true)
     {
-        $types = $this->expandTypesInternal($name, $val);
+        $types = $this->expandTypesInternal($name, $val, $sensor);
 
         return $root ? $this->flatten($types) : $types;
     }
 
-    public function expandValues($name, $val, $root = true)
+    public function expandValues($name, $val, CaseSensor $sensor, $root = true)
     {
-        $values = $this->expandValuesInternal($name, $val);
+        $values = $this->expandValuesInternal($name, $val, $sensor);
 
         return $root ? $this->flatten($values) : $values;
     }

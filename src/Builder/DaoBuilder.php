@@ -271,11 +271,14 @@ $ns
 use Omelet;
 use Omelet\Core\DaoBase;
 use Omelet\Builder\DaoBuilderContext;
+use Omelet\Util\CaseSensor;
 
 use Doctrine\DBAL\Driver\Connection;
 
 class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
     const AccessRoute = '{$accessRoute}';
+    
+    private \$paramFormatter;
     
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
         \$hint = {$seqHint};
@@ -283,6 +286,8 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             ->getSequenceNameManager()
             ->findStrategy(\$conn->getDriver()->getName())
             ->resolve(\$hint);
+        
+        \$this->paramFormatter = CaseSensor::{\$context->getConfig()->paramCaseSensor}();
         
         parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'), empty(\$seq) ? null : \$seq);
     }
@@ -352,7 +357,10 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         \$params = [$params];
         \$returnDomain = {$returning};
 
-        \$rows = \$this->{$caller}('$methodName', \$paramDomain->expandValues('', \$params), \$paramDomain->expandTypes('', \$params));
+        \$rows = \$this->{$caller}('$methodName', 
+            \$paramDomain->expandValues('', \$params, \$this->paramFormatter), 
+            \$paramDomain->expandTypes('', \$params, \$this->paramFormatter)
+        );
 
         return \$this->convertResults(\$rows, \$returnDomain);
     }"

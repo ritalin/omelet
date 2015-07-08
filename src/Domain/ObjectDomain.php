@@ -3,6 +3,7 @@
 namespace Omelet\Domain;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Omelet\Util\CaseSensor;
 
 class ObjectDomain extends DomainBase {
     /**
@@ -23,20 +24,20 @@ class ObjectDomain extends DomainBase {
         return $this->fields;
     }
     
-    protected function expandTypesInternal($name, $val) {
+    protected function expandTypesInternal($name, $val, CaseSensor $sensor) {
         return $this->expand(
             $name, $val, 
-            function ($field, $k, $v) {
-                return $field->expandTypes($k, $v);
+            function ($field, $k, $v) use ($sensor) {
+                return $field->expandTypes($k, $v, $sensor);
             }
         );
     }
     
-    protected function expandValuesInternal($name, $val) {
+    protected function expandValuesInternal($name, $val, CaseSensor $sensor) {
         return $this->expand(
             $name, $val, 
-            function ($field, $k, $v) {
-                return $field->expandValues($k, $v);
+            function ($field, $k, $v) use ($sensor) {
+                return $field->expandValues($k, $v, $sensor);
             }
         );
     }

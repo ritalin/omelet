@@ -4,6 +4,7 @@ namespace Omelet\Domain;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Omelet\Util\CaseSensor;
 
 abstract class CustomDomain extends DomainBase
 {
@@ -56,12 +57,12 @@ abstract class CustomDomain extends DomainBase
         return isset($this->optValues[$name]) ? $this->optValues[$name] : null;
     }
 
-    protected function expandTypesInternal($name, $val)
+    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
     {
         return [$name => Type::getType($this->type)];
     }
 
-    protected function expandValuesInternal($name, $val)
+    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
     {
         return [$name => $this->value];
     }
