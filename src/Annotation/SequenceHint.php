@@ -24,7 +24,7 @@ class SequenceHint
     /**
      * Sequence name.
      *
-     * @var $name
+     * @var string
      */
     public $name;
     
