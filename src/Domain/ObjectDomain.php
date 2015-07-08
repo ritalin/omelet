@@ -26,7 +26,7 @@ class ObjectDomain extends DomainBase {
     
     protected function expandTypesInternal($name, $val, CaseSensor $sensor) {
         return $this->expand(
-            $name, $val, 
+            $name, $val, $sensor, 
             function ($field, $k, $v) use ($sensor) {
                 return $field->expandTypes($k, $v, $sensor);
             }
@@ -35,7 +35,7 @@ class ObjectDomain extends DomainBase {
     
     protected function expandValuesInternal($name, $val, CaseSensor $sensor) {
         return $this->expand(
-            $name, $val, 
+            $name, $val, $sensor,
             function ($field, $k, $v) use ($sensor) {
                 return $field->expandValues($k, $v, $sensor);
             }
@@ -62,11 +62,11 @@ class ObjectDomain extends DomainBase {
         return $obj;
     }
     
-    private function expand($name, $val, callable $fn) {
+    private function expand($name, $val, CaseSensor $sensor, callable $fn) {
         return array_reduce(
             array_keys($this->fields),
-            function (array &$tmp, $k) use($name, $val, $fn) {
-                $n = $name !== "" ? "{$name}_{$k}" : $k;
+            function (array &$tmp, $k) use($name, $val, $sensor, $fn) {
+                $n = $name !== "" ? $sensor->convert($name, $k) : $k;
                 return $tmp + [$k => $fn($this->fields[$k], $n, $val->{$k})];
             },
             []
