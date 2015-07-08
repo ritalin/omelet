@@ -8,8 +8,8 @@ use Omelet\Domain\CustomDomain;
 
 class Hidden extends CustomDomain
 {
-    public function __construct($notVisible)
+    public function __construct($value)
     {
-        parent::__construct(Type::BOOLEAN, $notVisible);
+        parent::__construct(Type::BOOLEAN, $value);
     }
 }

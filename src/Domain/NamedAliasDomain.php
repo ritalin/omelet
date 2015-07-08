@@ -60,12 +60,26 @@ class NamedAliasDomain extends DomainBase
 
     protected function expandTypesInternal($name, $val, CaseSensor $sensor)
     {
-        return $this->domain->expandTypes($name, $val, $sensor);
+        $n = $sensor->convert($name, $this->name);
+        
+        if ($val instanceof DomainBase) {
+            return  $val->expandTypes($n, $val, $sensor); 
+        }
+        else {
+            return $this->domain->expandTypes($n, $val, $sensor);
+        }
     }
 
     protected function expandValuesInternal($name, $val, CaseSensor $sensor)
     {
-        return $this->domain->expandValues($name, $val, $sensor);
+        $n = $sensor->convert($name, $this->name);
+        
+        if ($val instanceof DomainBase) {
+            return  $val->expandValues($n, $val, $sensor); 
+        }
+        else {
+            return $this->domain->expandValues($n, $val, $sensor);
+        }
     }
 
     protected function convertResultsInternal($results, AbstractPlatform $platform)

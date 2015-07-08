@@ -8,8 +8,8 @@ use Omelet\Domain\CustomDomain;
 
 class Telephone extends CustomDomain
 {
-    public function __construct($tel)
+    public function __construct($number)
     {
-        parent::__construct(Type::STRING, $tel);
+        parent::__construct(Type::STRING, $number);
     }
 }

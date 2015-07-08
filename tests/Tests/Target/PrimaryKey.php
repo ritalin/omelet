@@ -8,8 +8,8 @@ use Omelet\Domain\CustomDomain;
 
 class PrimaryKey extends CustomDomain
 {
-    public function __construct($id)
+    public function __construct($value)
     {
-        parent::__construct(Type::INTEGER, $id);
+        parent::__construct(Type::INTEGER, $value);
     }
 }

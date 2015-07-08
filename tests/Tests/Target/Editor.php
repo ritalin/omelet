@@ -7,9 +7,9 @@ use Omelet\Domain\CustomDomain;
 
 class Editor extends CustomDomain
 {
-    public function __construct($editorId, $editorName = '')
+    public function __construct($id, $editorName = '')
     {
-        parent::__construct(Type::INTEGER, $editorId, ['name' => $editorName]);
+        parent::__construct(Type::INTEGER, $id, ['name' => $editorName]);
     }
 
     public function getId()

@@ -172,8 +172,8 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $defs = $factory->parse('aaa', '\Omelet\Tests\Target\Telephone', CaseSensor::LowerSnake());
 
         $this->assertInstanceOf(Domain\WrappedDomain::class, $defs);
-        $this->assertEquals(['aaa' => Type::getType(Type::STRING)], $defs->expandTypes('aaa', new Telephone('080-999-9999'), CaseSensor::LowerSnake()));
-        $this->assertEquals(['aaa' => '080-999-9999'], $defs->expandValues('aaa', new Telephone('080-999-9999'), CaseSensor::LowerSnake()));
+        $this->assertEquals(['aaa_number' => Type::getType(Type::STRING)], $defs->expandTypes('aaa', new Telephone('080-999-9999'), CaseSensor::LowerSnake()));
+        $this->assertEquals(['aaa_number' => '080-999-9999'], $defs->expandValues('aaa', new Telephone('080-999-9999'), CaseSensor::LowerSnake()));
     }
 
     /**

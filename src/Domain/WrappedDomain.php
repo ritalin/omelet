@@ -34,7 +34,8 @@ class WrappedDomain extends DomainBase
 
     protected function expandValuesInternal($name, $val, CaseSensor $sensor)
     {
-        return ($val instanceof CustomDomain) ? $val->expandValues($name, $val, $sensor, false) : [];
+        return current($this->fieldDomains)->expandValues($name, $val, $sensor, false);
+//        return ($val instanceof CustomDomain) ? $val->expandValues($name, $val, $sensor, false) : [];
     }
 
     protected function convertResultsInternal($results, AbstractPlatform $platform)

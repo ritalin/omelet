@@ -67,7 +67,7 @@ class ObjectDomain extends DomainBase {
             array_keys($this->fields),
             function (array &$tmp, $k) use($name, $val, $sensor, $fn) {
                 $n = $name !== "" ? $sensor->convert($name, $k) : $k;
-                return $tmp + [$k => $fn($this->fields[$k], $n, $val->{$k})];
+                return $tmp + [$k => $fn($this->fields[$k], $name, $val->{$k})];
             },
             []
         );
