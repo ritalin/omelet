@@ -10,22 +10,22 @@ final class CaseSensor
 
     public static function LowerSnake()
     {
-        return new self(self::getFormatter(Format\SnakeCase::class));
+        return new self(Format\SnakeCase::class);
     }
 
     public static function UpperSnake()
     {
-        return new self(self::getFormatter(Format\ScreamingSnakeCase::class));
+        return new self(Format\ScreamingSnakeCase::class);
     }
 
     public static function LowerCamel()
     {
-        return new self(self::getFormatter(Format\CamelCase::class));
+        return new self(Format\CamelCase::class);
     }
 
     public static function UpperCamel()
     {
-        return new self(self::getFormatter(Format\StudlyCaps::class));
+        return new self(Format\StudlyCaps::class);
     }
 
     private static function getFormatter($class)
@@ -47,18 +47,21 @@ final class CaseSensor
      */
     private $formatter;
 
-    private function __construct(Format\FormatInterface $formatter)
+    private function __construct($formatterClass)
     {
-        $this->formatter = $formatter;
+        $this->formatter = self::getFormatter($formatterClass);
     }
 
-    public function convert($input)
+    public function convert(...$inputs)
     {
-        $tokens = $this->getSplitter($input)->split($input);
+        $tokens = [];
+        foreach ($inputs as $input) {
+            $tokens[] = $this->getSplitter($input)->split($input);
+        }
 
-        return $this->formatter->join($tokens);
+        return $this->formatter->join(call_user_func_array('array_merge', $tokens));
     }
-
+    
     private function getSplitter($input)
     {
         if (strpos($input, '_') !== false) {
