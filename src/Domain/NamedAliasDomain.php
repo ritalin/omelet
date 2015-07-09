@@ -12,7 +12,7 @@ class NamedAliasDomain extends DomainBase
      */
     private $name;
     /**
-     * @var string
+     * @var string[]
      */
     private $alias;
     /**
@@ -29,7 +29,7 @@ class NamedAliasDomain extends DomainBase
      */
     private $domain;
 
-    public function __construct(DomainBase $domain, $name, $alias, $default, array $optFields = [])
+    public function __construct(DomainBase $domain, $name, array $alias, $default, array $optFields = [])
     {
         $this->domain = $domain;
         $this->name = $name;
@@ -42,7 +42,10 @@ class NamedAliasDomain extends DomainBase
     {
         return $this->name;
     }
-
+    
+    /**
+     * @return string[]
+     */
     public function getAlias()
     {
         return $this->alias;
@@ -57,11 +60,25 @@ class NamedAliasDomain extends DomainBase
     {
         return $this->domain;
     }
-
+    
+    private function resolveName(array $availables, $baseName, array $subNames, CaseSensor $sensor)
+    {
+        foreach ($subNames as $name) {
+            $n = $sensor->convert($baseName, $name);
+            if (isset($availables[$n])) {
+                return $n;
+            }
+        }
+        
+        return false;
+    }
+    
     protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
-        $n = $sensor->convert($name, $this->name);
-        
+        if (($n = $this->resolveName(array_flip($availableParams), $name, array_merge([$this->name], $this->alias), $sensor)) === false) {
+            return [];
+        }
+
         if ($val instanceof DomainBase) {
             return  $val->expandTypes($availableParams, $n, $val, $sensor); 
         }
@@ -72,7 +89,9 @@ class NamedAliasDomain extends DomainBase
 
     protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
-        $n = $sensor->convert($name, $this->name);
+        if (($n = $this->resolveName(array_flip($availableParams), $name, array_merge([$this->name], $this->alias), $sensor)) === false) {
+            return [];
+        }
         
         if ($val instanceof DomainBase) {
             return  $val->expandValues($availableParams, $n, $val, $sensor); 
@@ -101,10 +120,14 @@ class NamedAliasDomain extends DomainBase
     private function getPrimaryValue(array &$results)
     {
         $value = null;
-        if ((! empty($this->alias)) && isset($results[$this->alias])) {
-            return $results[$this->alias];
+        if (count($this->alias) > 0) {
+            $alias = array_flip($this->alias);
+            if ($matches = array_intersect_key($results, $alias)) {
+                return $results[key($matches)];
+            }
         }
-        elseif (isset($results[$this->name])) {
+        
+        if (isset($results[$this->name])) {
             return $results[$this->name];
         }
         else {

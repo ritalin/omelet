@@ -466,7 +466,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function test_export_select_returning_object_domain()
+    public function test_select_returning_object_domain()
     {
         $logger = null;
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
@@ -476,6 +476,21 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Timestamp::class, $results);
         $this->assertEquals(new \DateTime('2015/10/10 12:13:59'), $results->getValue());
+    }
+
+    /**
+     * @test
+     */
+    public function test_select_returning_domain_with_domain()
+    {
+        $logger = null;
+//        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
+        $dao = $this->exportDao(ConstDao::class, $logger);
+
+        $results = $dao->hidden(new hidden(0));
+
+        $this->assertInstanceOf(hidden::class, $results);
+        $this->assertEquals(1, $results->getValue());
     }
 
     /**
@@ -726,12 +741,12 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('id', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
             $this->assertEquals('id', $children['id']->getName());
-            $this->assertEquals('todo_id', $children['id']->getAlias());
+            $this->assertEquals(['todo_id'], $children['id']->getAlias());
 
             $this->assertArrayHasKey('creator', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
             $this->assertEquals('creator', $children['creator']->getName());
-            $this->assertEquals('creator_id', $children['creator']->getAlias());
+            $this->assertEquals(['creator_id'], $children['creator']->getAlias());
             $this->assertEquals(['creator_name'], $children['creator']->getOptFields());
         }
         upperSnake: {
@@ -749,12 +764,12 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('id', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
             $this->assertEquals('ID', $children['id']->getName());
-            $this->assertEquals('TODO_ID', $children['id']->getAlias());
+            $this->assertEquals(['TODO_ID'], $children['id']->getAlias());
 
             $this->assertArrayHasKey('creator', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
             $this->assertEquals('CREATOR', $children['creator']->getName());
-            $this->assertEquals('CREATOR_ID', $children['creator']->getAlias());
+            $this->assertEquals(['CREATOR_ID'], $children['creator']->getAlias());
             $this->assertEquals(['CREATOR_NAME'], $children['creator']->getOptFields());
         }
         lowerCamel: {
@@ -772,12 +787,12 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('id', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
             $this->assertEquals('id', $children['id']->getName());
-            $this->assertEquals('todoId', $children['id']->getAlias());
+            $this->assertEquals(['todoId'], $children['id']->getAlias());
 
             $this->assertArrayHasKey('creator', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
             $this->assertEquals('creator', $children['creator']->getName());
-            $this->assertEquals('creatorId', $children['creator']->getAlias());
+            $this->assertEquals(['creatorId'], $children['creator']->getAlias());
             $this->assertEquals(['creatorName'], $children['creator']->getOptFields());
         }
         upperCamel: {
@@ -795,12 +810,12 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertArrayHasKey('id', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['id']);
             $this->assertEquals('Id', $children['id']->getName());
-            $this->assertEquals('TodoId', $children['id']->getAlias());
+            $this->assertEquals(['TodoId'], $children['id']->getAlias());
 
             $this->assertArrayHasKey('creator', $children);
             $this->assertInstanceOf(Domain\NamedAliasDomain::class, $children['creator']);
             $this->assertEquals('Creator', $children['creator']->getName());
-            $this->assertEquals('CreatorId', $children['creator']->getAlias());
+            $this->assertEquals(['CreatorId'], $children['creator']->getAlias());
             $this->assertEquals(['CreatorName'], $children['creator']->getOptFields());
         }
     }

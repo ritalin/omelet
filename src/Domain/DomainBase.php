@@ -15,14 +15,22 @@ abstract class DomainBase
     {
         $types = $this->expandTypesInternal($availableParams, $name, $val, $sensor);
 
-        return $root ? $this->flatten($types) : $types;
+        if ($root) {
+            $types = $this->flatten($types);
+        }
+        
+        return $types;
     }
 
     public function expandValues(array $availableParams, $name, $val, CaseSensor $sensor, $root = true)
     {
         $values = $this->expandValuesInternal($availableParams, $name, $val, $sensor);
 
-        return $root ? $this->flatten($values) : $values;
+        if ($root) {
+            $values = $this->flatten($values);
+        }
+        
+        return $values;
     }
 
     public function convertResults($results, AbstractPlatform $platform)

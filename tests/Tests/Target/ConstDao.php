@@ -26,4 +26,11 @@ interface ConstDao
      * @return Timestamp
      */
     public function now();
+
+    /**
+     * @Select
+     *
+     * @return Hidden
+     */
+    public function hidden(Hidden $hidden);
 }
