@@ -216,13 +216,14 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
                 'aaa_id' => Type::getType(Type::INTEGER),
                 'aaa_todo' => Type::getType(Type::STRING),
                 'aaa_created' => Type::getType(Type::DATETIME),
-                'aaa_hidden' => Type::getType(Type::BOOLEAN)
+                'aaa_hidden' => Type::getType(Type::BOOLEAN),
+                'aaa_creator' => Type::getType(Type::STRING),
             ],
             $defs->expandTypes('aaa', $entity, CaseSensor::LowerSnake())
         );
 
         $this->assertEquals(
-            ['aaa_id' => 1024, 'aaa_todo' => 'test', 'aaa_created' => new \DateTime('2015/5/18 12:7:09'), 'aaa_hidden' => false],
+            ['aaa_id' => 1024, 'aaa_todo' => 'test', 'aaa_created' => new \DateTime('2015/5/18 12:7:09'), 'aaa_hidden' => false, 'aaa_creator' => null],
             $defs->expandValues('aaa', $entity, CaseSensor::LowerSnake())
         );
     }
@@ -259,13 +260,14 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
                 'obj_todo' => Type::getType(Type::STRING),
                 'obj_created' => Type::getType(Type::DATETIME),
                 'obj_hidden' => Type::getType(Type::BOOLEAN),
+                'obj_creator' => Type::getType(Type::STRING),
                 'hoge' => Type::getType(Type::INTEGER)
             ],
             $defs->expandTypes('', $values, CaseSensor::LowerSnake())
         );
 
         $this->assertEquals(
-            ['obj_id' => 1024, 'obj_todo' => 'test', 'obj_created' => new \DateTime('2015/5/18 12:7:09'), 'obj_hidden' => true, 'hoge' => 4096],
+            ['obj_id' => 1024, 'obj_todo' => 'test', 'obj_created' => new \DateTime('2015/5/18 12:7:09'), 'obj_hidden' => true, 'obj_creator' => null, 'hoge' => 4096],
             $defs->expandValues('', $values, CaseSensor::LowerSnake())
         );
     }

@@ -1,2 +1,2 @@
-select id from todo
+select id as value from todo
 order by id desc

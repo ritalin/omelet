@@ -102,17 +102,14 @@ class NamedAliasDomain extends DomainBase
     {
         $value = null;
         if ((! empty($this->alias)) && isset($results[$this->alias])) {
-            $value = $results[$this->alias];
+            return $results[$this->alias];
         }
         elseif (isset($results[$this->name])) {
-            $value = $results[$this->name];
+            return $results[$this->name];
         }
-
-        if ($value === null) {
-            $value =  $this->default;
+        else {
+            return $this->default;
         }
-
-        return $value;
     }
 
     private function getOptValues(array &$results)
