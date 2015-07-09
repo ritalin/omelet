@@ -24,20 +24,20 @@ class ObjectDomain extends DomainBase {
         return $this->fields;
     }
     
-    protected function expandTypesInternal($name, $val, CaseSensor $sensor) {
+    protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor) {
         return $this->expand(
             $name, $val, $sensor, 
-            function ($field, $k, $v) use ($sensor) {
-                return $field->expandTypes($k, $v, $sensor);
+            function ($field, $k, $v) use ($availableParams, $sensor) {
+                return $field->expandTypes($availableParams, $k, $v, $sensor);
             }
         );
     }
     
-    protected function expandValuesInternal($name, $val, CaseSensor $sensor) {
+    protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor) {
         return $this->expand(
             $name, $val, $sensor,
-            function ($field, $k, $v) use ($sensor) {
-                return $field->expandValues($k, $v, $sensor);
+            function ($field, $k, $v) use ($availableParams, $sensor) {
+                return $field->expandValues($availableParams, $k, $v, $sensor);
             }
         );
     }

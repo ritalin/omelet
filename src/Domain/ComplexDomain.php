@@ -24,27 +24,27 @@ class ComplexDomain extends DomainBase
         return $this->domains;
     }
 
-    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
+    protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         return array_reduce(
             array_keys($this->domains),
-            function (array &$tmp, $k) use ($val, $sensor) {
+            function (array &$tmp, $k) use ($availableParams, $val, $sensor) {
                 $n = $this->boundOneArray ? '' : $k;
 
-                return $tmp + [$k => $this->domains[$k]->expandTypes($n, $val[$k], $sensor)];
+                return $tmp + [$k => $this->domains[$k]->expandTypes($availableParams, $n, $val[$k], $sensor)];
             },
             []
         );
     }
 
-    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
+    protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         return array_reduce(
             array_keys($this->domains),
-            function (array &$tmp, $k) use ($val, $sensor) {
+            function (array &$tmp, $k) use ($availableParams, $val, $sensor) {
                 $n = $this->boundOneArray ? '' : $k;
 
-                return $tmp + [$k => $this->domains[$k]->expandValues($n, $val[$k], $sensor)];
+                return $tmp + [$k => $this->domains[$k]->expandValues($availableParams, $n, $val[$k], $sensor)];
             },
             []
         );

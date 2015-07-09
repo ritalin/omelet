@@ -58,27 +58,27 @@ class NamedAliasDomain extends DomainBase
         return $this->domain;
     }
 
-    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
+    protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         $n = $sensor->convert($name, $this->name);
         
         if ($val instanceof DomainBase) {
-            return  $val->expandTypes($n, $val, $sensor); 
+            return  $val->expandTypes($availableParams, $n, $val, $sensor); 
         }
         else {
-            return $this->domain->expandTypes($n, $val, $sensor);
+            return $this->domain->expandTypes($availableParams, $n, $val, $sensor);
         }
     }
 
-    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
+    protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         $n = $sensor->convert($name, $this->name);
         
         if ($val instanceof DomainBase) {
-            return  $val->expandValues($n, $val, $sensor); 
+            return  $val->expandValues($availableParams, $n, $val, $sensor); 
         }
         else {
-            return $this->domain->expandValues($n, $val, $sensor);
+            return $this->domain->expandValues($availableParams, $n, $val, $sensor);
         }
     }
 

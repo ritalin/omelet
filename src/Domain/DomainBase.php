@@ -7,20 +7,20 @@ use Omelet\Util\CaseSensor;
 
 abstract class DomainBase
 {
-    abstract protected function expandTypesInternal($name, $val, CaseSensor $sensor);
-    abstract protected function expandValuesInternal($name, $val, CaseSensor $sensor);
+    abstract protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor);
+    abstract protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor);
     abstract protected function convertResultsInternal($results, AbstractPlatform $platform);
 
-    public function expandTypes($name, $val, CaseSensor $sensor, $root = true)
+    public function expandTypes(array $availableParams, $name, $val, CaseSensor $sensor, $root = true)
     {
-        $types = $this->expandTypesInternal($name, $val, $sensor);
+        $types = $this->expandTypesInternal($availableParams, $name, $val, $sensor);
 
         return $root ? $this->flatten($types) : $types;
     }
 
-    public function expandValues($name, $val, CaseSensor $sensor, $root = true)
+    public function expandValues(array $availableParams, $name, $val, CaseSensor $sensor, $root = true)
     {
-        $values = $this->expandValuesInternal($name, $val, $sensor);
+        $values = $this->expandValuesInternal($availableParams, $name, $val, $sensor);
 
         return $root ? $this->flatten($values) : $values;
     }

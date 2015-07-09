@@ -27,14 +27,14 @@ class WrappedDomain extends DomainBase
         return $this->type;
     }
 
-    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
+    protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
-        return current($this->fieldDomains)->expandTypes($name, $val, $sensor, false);
+        return current($this->fieldDomains)->expandTypes($availableParams, $name, $val, $sensor, false);
     }
 
-    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
+    protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
-        return current($this->fieldDomains)->expandValues($name, $val, $sensor, false);
+        return current($this->fieldDomains)->expandValues($availableParams, $name, $val, $sensor, false);
     }
 
     protected function convertResultsInternal($results, AbstractPlatform $platform)

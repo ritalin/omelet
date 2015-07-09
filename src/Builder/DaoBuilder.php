@@ -353,14 +353,17 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
 
         return
 "    public function {$methodName}({$paramDefs}) {
-        \$paramDomain = {$domain};
         \$params = [$params];
         \$returnDomain = {$returning};
+        
+        \$rows = \$this->{$caller}('$methodName', function (\$paramNames) use (\$params) {
+            \$paramDomain = {$domain};
 
-        \$rows = \$this->{$caller}('$methodName', 
-            \$paramDomain->expandValues('', \$params, \$this->paramFormatter), 
-            \$paramDomain->expandTypes('', \$params, \$this->paramFormatter)
-        );
+            return [
+                \$paramDomain->expandValues(\$paramNames, '', \$params, \$this->paramFormatter), 
+                \$paramDomain->expandTypes(\$paramNames, '', \$params, \$this->paramFormatter)
+            ];
+        });
 
         return \$this->convertResults(\$rows, \$returnDomain);
     }"
