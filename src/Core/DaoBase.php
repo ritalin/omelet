@@ -45,12 +45,12 @@ class DaoBase
     
     protected function fetchAll($key, array $params, array $types)
     {
-        return $this->conn->fetchAll($this->queries[$key], $params, $types);
+        return $this->conn->executeQuery($this->queries[$key], $params, $types)->fetchAll();
     }
 
     protected function fetchRow($key, array $params, array $types)
     {
-        return $this->conn->fetchAssoc($this->queries[$key], $params, $types);
+        return $this->conn->executeQuery($this->queries[$key], $params, $types)->fetch(\PDO::FETCH_ASSOC);
     }
 
     protected function execute($key, array $params, array $types)
