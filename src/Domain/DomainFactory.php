@@ -159,7 +159,7 @@ final class DomainFactory
                 $columnType = $this->extractAnnotation($annotations, ColumnType::class, function ($a) { return $a->type; });
                 list($alias, $default, $optFields) = $this->extractAnnotation(
                     $annotations, Column::class, function ($a) {
-                        return [ $a->alias, $a->default, $a->optFields ];
+                        return [ $a->name, $a->default, $a->optFields ];
                     }
                 );
                 $domain = $this->parseInternal($f->name, $columnType, $sensor, false);

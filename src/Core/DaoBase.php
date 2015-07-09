@@ -118,32 +118,16 @@ class DaoBase
         $stmt = $this->conn->prepare($query);
         
         foreach ($params as $i => $value) {
-            if (isset($types[$i])) {
-                $type = $types[$i];
-                list($value, $bindingType) = $this->getBindingInfo($value, $type);
-                
-                $stmt->bindValue($i+1, $value, $bindingType);
-            } else {
-                $stmt->bindValue($i+1, $value);
-            }
+            $type = $types[$i];
+            
+            $stmt->bindValue(
+                $i+1, 
+                $type->convertToDatabaseValue($value, $this->conn->getDatabasePlatform()), 
+                $type->getBindingType()
+            );
         }
         
         return $stmt;
-    }
-
-    private function getBindingInfo($value, $type)
-    {
-        if (is_string($type)) {
-            $type = Type::getType($type);
-        }
-        if ($type instanceof Type) {
-            $value = $type->convertToDatabaseValue($value, $this->getDatabasePlatform());
-            $bindingType = $type->getBindingType();
-        } else {
-            $bindingType = $type; // PDO::PARAM_* constants
-        }
-
-        return array($value, $bindingType);
     }
     
     protected function convertResults($results, DomainBase $domain)
