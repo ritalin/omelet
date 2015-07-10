@@ -28,7 +28,7 @@ class ObjectDomain extends DomainBase {
         return $this->expand(
             $name, $val, $sensor, 
             function ($field, $k, $v) use ($availableParams, $sensor) {
-                return $field->expandTypes($availableParams, $k, $v, $sensor);
+                return $field->expandTypes($availableParams, $k, $v, $sensor, false);
             }
         );
     }
@@ -37,7 +37,7 @@ class ObjectDomain extends DomainBase {
         return $this->expand(
             $name, $val, $sensor,
             function ($field, $k, $v) use ($availableParams, $sensor) {
-                return $field->expandValues($availableParams, $k, $v, $sensor);
+                return $field->expandValues($availableParams, $k, $v, $sensor, false);
             }
         );
     }

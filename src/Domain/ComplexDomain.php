@@ -31,7 +31,7 @@ class ComplexDomain extends DomainBase
             function (array &$tmp, $k) use ($availableParams, $val, $sensor) {
                 $n = $this->boundOneArray ? '' : $k;
 
-                return $tmp + [$k => $this->domains[$k]->expandTypes($availableParams, $n, $val[$k], $sensor)];
+                return $tmp + [$k => $this->domains[$k]->expandTypes($availableParams, $n, $val[$k], $sensor, false)];
             },
             []
         );
@@ -44,7 +44,7 @@ class ComplexDomain extends DomainBase
             function (array &$tmp, $k) use ($availableParams, $val, $sensor) {
                 $n = $this->boundOneArray ? '' : $k;
 
-                return $tmp + [$k => $this->domains[$k]->expandValues($availableParams, $n, $val[$k], $sensor)];
+                return $tmp + [$k => $this->domains[$k]->expandValues($availableParams, $n, $val[$k], $sensor, false)];
             },
             []
         );

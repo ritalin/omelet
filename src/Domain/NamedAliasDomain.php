@@ -80,10 +80,10 @@ class NamedAliasDomain extends DomainBase
         }
 
         if ($val instanceof DomainBase) {
-            return  $val->expandTypes($availableParams, $n, $val, $sensor); 
+            return  $val->expandTypes($availableParams, $n, $val, $sensor, false); 
         }
         else {
-            return $this->domain->expandTypes($availableParams, $n, $val, $sensor);
+            return $this->domain->expandTypes($availableParams, $n, $val, $sensor, false);
         }
     }
 
@@ -94,10 +94,10 @@ class NamedAliasDomain extends DomainBase
         }
         
         if ($val instanceof DomainBase) {
-            return  $val->expandValues($availableParams, $n, $val, $sensor); 
+            return  $val->expandValues($availableParams, $n, $val, $sensor, false); 
         }
         else {
-            return $this->domain->expandValues($availableParams, $n, $val, $sensor);
+            return $this->domain->expandValues($availableParams, $n, $val, $sensor, false);
         }
     }
 

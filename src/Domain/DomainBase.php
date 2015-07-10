@@ -17,6 +17,13 @@ abstract class DomainBase
 
         if ($root) {
             $types = $this->flatten($types);
+            
+            $diff = array_diff_key(array_flip($availableParams), $types);
+            if (count($diff) > 0) {
+                throw new \RuntimeException(
+                    sprintf('All SQL parameter has not been bound (%s)', implode(',', array_keys($diff)))
+                );
+            }
         }
         
         return $types;
@@ -28,6 +35,13 @@ abstract class DomainBase
 
         if ($root) {
             $values = $this->flatten($values);
+            
+            $diff = array_diff_key(array_flip($availableParams), $values);
+            if (count($diff) > 0) {
+                throw new \RuntimeException(
+                    sprintf('All SQL parameter has not been bound (%s)', implode(',', array_keys($diff)))
+                );
+            }
         }
         
         return $values;

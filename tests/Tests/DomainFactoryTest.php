@@ -104,8 +104,8 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Domain\ArrayDomain::class, $defs);
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs->childDomain());
         $this->assertEquals(Type::STRING, $defs->childDomain()->getType());
-        $this->assertEquals([$t, $t, $t], $defs->expandTypes(['aaa'], '', ['123', '456', 'qwy'], CaseSensor::LowerSnake()));
-        $this->assertEquals(['123', '456', 'qwy'], $defs->expandValues(['aaa'], '', ['123', '456', 'qwy'], CaseSensor::LowerSnake()));
+        $this->assertEquals([$t, $t, $t], $defs->expandTypes([0, 1, 2], '', ['123', '456', 'qwy'], CaseSensor::LowerSnake()));
+        $this->assertEquals(['123', '456', 'qwy'], $defs->expandValues([0, 1, 2], '', ['123', '456', 'qwy'], CaseSensor::LowerSnake()));
 
         $defs = $factory->parse('aaa', 'string[]', CaseSensor::LowerSnake());
 
@@ -114,11 +114,11 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::STRING, $defs->childDomain()->getType());
         $this->assertEquals(
             ['f1' => $t, 'f2' => $t, 'f3' => $t],
-            $defs->expandTypes(['f1, f2, f3'], '', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
+            $defs->expandTypes(['f1', 'f2', 'f3'], '', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
         );
         $this->assertEquals(
             ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], 
-            $defs->expandValues(['f1, f2, f3'], '', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
+            $defs->expandValues(['f1', 'f2', 'f3'], '', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
         );
 
         $defs = $factory->parse('aaa', 'int[]', CaseSensor::LowerSnake());
@@ -160,11 +160,11 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::INTEGER, $defs->childDomain()->childDomain()->getType());
         $this->assertEquals(
             ['f1_0' => $t, 'f1_1' => $t, 'f2_0' => $t, 'f2_1' => $t],
-            $defs->expandTypes(['f1_0', 'f1_1', 'f1_2'], '', ['f1' => [123, 456], 'f2' => [789, 192]], CaseSensor::LowerSnake())
+            $defs->expandTypes(['f1_0', 'f1_1', 'f2_0', 'f2_1'], '', ['f1' => [123, 456], 'f2' => [789, 192]], CaseSensor::LowerSnake())
         );
         $this->assertEquals(
             ['f1_0' => 123, 'f1_1' => 456, 'f2_0' => 789, 'f2_1' => 192],
-            $defs->expandValues(['f1_0', 'f1_1', 'f1_2'], '', ['f1' => [123, 456], 'f2' => [789, 192]], CaseSensor::LowerSnake())
+            $defs->expandValues(['f1_0', 'f1_1', 'f2_0', 'f2_1'], '', ['f1' => [123, 456], 'f2' => [789, 192]], CaseSensor::LowerSnake())
         );
     }
 
