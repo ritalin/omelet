@@ -11,6 +11,6 @@ use Doctrine\Common\Annotations\Annotation\Target;
  * @Annotation
  * @Target("METHOD")
  */
-final class Insert implements Core\DaoAnnotation
+final class Insert extends Core\AbstractCommandAnnotation implements Core\DaoAnnotation
 {
 }

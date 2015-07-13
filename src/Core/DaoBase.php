@@ -44,33 +44,55 @@ class DaoBase
         return $this->conn->lastInsertId($this->seqName);
     }
     
-    protected function fetchAll($key, callable $paramCollecter)
+    protected function fetchAll($key, array $options, callable $paramCollecter)
     {
-        return $this->executeQuery($this->queries[$key], $paramCollecter)->fetchAll();
+        list($stmt,) = $this->executeQuery($this->queries[$key], $options, $paramCollecter);
+        
+        return $stmt->fetchAll();
     }
 
-    protected function fetchRow($key, callable $paramCollecter)
+    protected function fetchRow($key, array $options, callable $paramCollecter)
     {
-        return $this->executeQuery($this->queries[$key], $paramCollecter)->fetch(\PDO::FETCH_ASSOC);
+        list($stmt,) = $this->executeQuery($this->queries[$key], $options, $paramCollecter);
+        
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    protected function execute($key, callable $paramCollecter)
+    protected function execute($key, array $options, callable $paramCollecter)
     {
-        return $this->executeQuery($this->queries[$key], $paramCollecter)->rowCount();
+        list($stmt, $outParams) = $this->executeQuery($this->queries[$key], $options, $paramCollecter);
+        
+        if (count($outParams) > 0) {
+            return $outParams;
+        }
+        else {
+            return $stmt->rowCount();
+        }
     }
     
-    protected function executeQuery($query, callable $paramCollecter)
+    protected function executeQuery($query, array $options, callable $paramCollecter)
     {
         $paramPositions = $this->extractParameterPsitions($query);
         
-        list ($params, $types) = $paramCollecter($paramPositions);
+        $outNames = isset($options['returning']) ? $options['returning'] : [];
         
-        list ($query, $params, $types) = $this->expandListParameters($query, $paramPositions, $params, $types);
+        list ($params, $types) = $paramCollecter(array_diff($paramPositions, $outNames));
+        
+        list ($query, $params, $types, $outParams) = $this->expandListParameters($query, $paramPositions, $params, $types, array_flip($outNames));
 
         $stmt = $this->prepare($query, $params, $types);
+        
+        if (count($outParams) > 0) {
+            // bind output parameters
+            foreach ($outParams as $i => $p) {
+                $stmt->bindParam($i, $outParams[$i]);
+            }
+            $stmt->setFetchMode(PDO::FETCH_BOUND);
+        }
+        
         $stmt->execute();
         
-        return $stmt;
+        return [ $stmt, &$outParams ];
     }
     
     private function extractParameterPsitions($query)
@@ -78,23 +100,26 @@ class DaoBase
         return \Doctrine\DBAL\SQLParserUtils::getPlaceholderPositions($query, false);
     }
     
-    private function expandListParameters($query, array $paramPositions, array $params, array $types)
+    private function expandListParameters($query, array $paramPositions, array $params, array $types, array $outParamNames)
     {
+        $paramIndex = 1;
         $queryOffset = 0;
         $typesOrd    = [];
         $paramsOrd   = [];
-
+        $outParamsOrd= [];
+        
         foreach ($paramPositions as $pos => $paramName) {
             $paramLen = strlen($paramName) + 1;
             $value    = $params[$paramName];
-
             if (in_array($types[$paramName]->getBindingType(), [Connection::PARAM_INT_ARRAY, Connection::PARAM_STR_ARRAY])) {
                 $count      = count($value);
                 $expandStr  = $count > 0 ? implode(', ', array_fill(0, $count, '?')) : 'NULL';
 
                 foreach ($value as $val) {
-                    $paramsOrd[] = $val;
-                    $typesOrd[]  = $types[$paramName] - Connection::ARRAY_PARAM_OFFSET;
+                    $paramsOrd[$paramIndex] = $val;
+                    $typesOrd[$paramIndex]  = $types[$paramName] - Connection::ARRAY_PARAM_OFFSET;
+
+                    ++$paramIndex;
                 }
 
                 $pos         += $queryOffset;
@@ -102,15 +127,28 @@ class DaoBase
                 $query        = substr($query, 0, $pos) . $expandStr . substr($query, ($pos + $paramLen));
             }
             else {
-                $pos         += $queryOffset;
-                $queryOffset -= ($paramLen - 1);
-                $paramsOrd[]  = $value;
-                $typesOrd[]   = $types[$paramName];
-                $query        = substr($query, 0, $pos) . '?' . substr($query, ($pos + $paramLen));
+                
+                if (isset($outParamNames[$paramName])) {
+                    $pos         += $queryOffset;
+                    $name = $paramName;
+                    
+                    $outParamsOrd[$paramName] = "";
+                }
+                else {
+                    $pos         += $queryOffset;
+                    $queryOffset -= ($paramLen - 1);
+                    $name = '?';
+                
+                    $paramsOrd[$paramIndex]  = $value;
+                    $typesOrd[$paramIndex]   = $types[$paramName];
+                }
+                
+                $query = substr($query, 0, $pos) . $name . substr($query, ($pos + $paramLen));
+                ++$paramIndex;
             }
         }
 
-        return [ $query, $paramsOrd, $typesOrd ];
+        return [ $query, $paramsOrd, $typesOrd, $outParamsOrd ];
     }
     
     private function prepare($query, $params, $types)
@@ -121,7 +159,7 @@ class DaoBase
             $type = $types[$i];
             
             $stmt->bindValue(
-                $i+1, 
+                $i, 
                 $type->convertToDatabaseValue($value, $this->conn->getDatabasePlatform()), 
                 $type->getBindingType()
             );
