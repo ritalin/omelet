@@ -100,7 +100,9 @@ class DaoBuilder
 
     public function setParamCaseSensor($sensor)
     {
-        if ($sensor === null) return;
+        if ($sensor === null) {
+            return;
+        }
 
         $this->paramCaseSensor = $sensor;
     }
@@ -112,7 +114,9 @@ class DaoBuilder
 
     public function setReturnCaseSensor($sensor)
     {
-        if ($sensor === null) return;
+        if ($sensor === null) {
+            return;
+        }
 
         $this->returnCaseSensor = $sensor;
     }
@@ -240,7 +244,7 @@ class DaoBuilder
         else {
             echo $def;
 
-            return null;
+            return;
         }
     }
 
@@ -313,29 +317,29 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             return '';
         }
     }
-    
+
     private function getMethodByType($annotation, $returnDomain = null)
     {
         $type = get_class($annotation);
-        
+
         switch (true) {
             case $type === Select::class:
                 $class = ArrayDomain::class;
                 if ($returnDomain instanceof $class) {
-                    return [ 'fetchAll', [] ];
+                    return ['fetchAll', []];
                 }
                 else {
-                    return [ 'fetchRow', [] ];
+                    return ['fetchRow', []];
                 }
             case is_subclass_of($type, AbstractCommandAnnotation::class):
-                return [ 'execute', ['returning' => $annotation->returning] ];
+                return ['execute', ['returning' => $annotation->returning]];
             case $type === Delete::class:
-                return [ 'execute', [] ];
+                return ['execute', []];
             default:
                 throw new \LogicException("Unsupported command/Query annotation. ($type)");
         }
     }
-    
+
     private function methodTemplate(array $method)
     {
         $paramDefs = implode(', ',
@@ -359,21 +363,21 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             )
         );
         $returning = var_export($method['returnDomain'], true);
-        
+
         list($caller, $opts) = $this->getMethodByType($method['type'], $method['returnDomain']);
         $opts = var_export($opts, true);
-        
+
         return
 "    public function {$methodName}({$paramDefs}) {
         \$params = [$params];
         \$opts = $opts;
         \$returnDomain = {$returning};
-        
+
         \$rows = \$this->{$caller}('$methodName', \$opts, function (\$paramNames) use (\$params) {
             \$paramDomain = {$domain};
 
             return [
-                \$paramDomain->expandValues(\$paramNames, '', \$params, \$this->paramFormatter), 
+                \$paramDomain->expandValues(\$paramNames, '', \$params, \$this->paramFormatter),
                 \$paramDomain->expandTypes(\$paramNames, '', \$params, \$this->paramFormatter)
             ];
         });

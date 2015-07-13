@@ -42,7 +42,7 @@ class NamedAliasDomain extends DomainBase
     {
         return $this->name;
     }
-    
+
     /**
      * @return string[]
      */
@@ -60,7 +60,7 @@ class NamedAliasDomain extends DomainBase
     {
         return $this->domain;
     }
-    
+
     private function resolveName(array $availables, $baseName, array $subNames, CaseSensor $sensor)
     {
         foreach ($subNames as $name) {
@@ -69,10 +69,10 @@ class NamedAliasDomain extends DomainBase
                 return $n;
             }
         }
-        
+
         return false;
     }
-    
+
     protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         if (($n = $this->resolveName(array_flip($availableParams), $name, array_merge([$this->name], $this->alias), $sensor)) === false) {
@@ -80,7 +80,7 @@ class NamedAliasDomain extends DomainBase
         }
 
         if ($val instanceof DomainBase) {
-            return  $val->expandTypes($availableParams, $n, $val, $sensor, false); 
+            return  $val->expandTypes($availableParams, $n, $val, $sensor, false);
         }
         else {
             return $this->domain->expandTypes($availableParams, $n, $val, $sensor, false);
@@ -92,9 +92,9 @@ class NamedAliasDomain extends DomainBase
         if (($n = $this->resolveName(array_flip($availableParams), $name, array_merge([$this->name], $this->alias), $sensor)) === false) {
             return [];
         }
-        
+
         if ($val instanceof DomainBase) {
-            return  $val->expandValues($availableParams, $n, $val, $sensor, false); 
+            return  $val->expandValues($availableParams, $n, $val, $sensor, false);
         }
         else {
             return $this->domain->expandValues($availableParams, $n, $val, $sensor, false);
@@ -126,7 +126,7 @@ class NamedAliasDomain extends DomainBase
                 return $results[key($matches)];
             }
         }
-        
+
         if (isset($results[$this->name])) {
             return $results[$this->name];
         }

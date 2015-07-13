@@ -26,8 +26,8 @@ class ArrayDomain extends DomainBase
         }
 
         return $this->expand($name, $val, $sensor,
-            function ($k, $v) use ($availableParams, $sensor) { 
-                return $this->child->expandTypes($availableParams, $k, $v, $sensor, false); 
+            function ($k, $v) use ($availableParams, $sensor) {
+                return $this->child->expandTypes($availableParams, $k, $v, $sensor, false);
             }
         );
     }
@@ -39,8 +39,8 @@ class ArrayDomain extends DomainBase
         }
 
         return $this->expand($name, $val, $sensor,
-            function ($k, $v) use ($availableParams, $sensor) { 
-                return $this->child->expandValues($availableParams, $k, $v, $sensor, false); 
+            function ($k, $v) use ($availableParams, $sensor) {
+                return $this->child->expandValues($availableParams, $k, $v, $sensor, false);
             }
         );
     }

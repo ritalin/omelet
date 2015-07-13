@@ -19,7 +19,7 @@ final class ParamAlt
      * @var string
      */
     public $name;
-    
+
     public static function __set_state($values)
     {
         $a = new self();

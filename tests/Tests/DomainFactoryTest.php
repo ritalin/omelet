@@ -116,7 +116,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
             $defs->expandTypes(['f1', 'f2', 'f3'], '', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
         );
         $this->assertEquals(
-            ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], 
+            ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'],
             $defs->expandValues(['f1', 'f2', 'f3'], '', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
         );
 
@@ -127,11 +127,11 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs->childDomain());
         $this->assertEquals(Type::INTEGER, $defs->childDomain()->getType());
         $this->assertEquals(
-            ['aaa_0' => $t, 'aaa_1' => $t, 'aaa_2' => $t], 
+            ['aaa_0' => $t, 'aaa_1' => $t, 'aaa_2' => $t],
             $defs->expandTypes(['aaa_0', 'aaa_1', 'aaa_2'], 'aaa', [123, 456, 789], CaseSensor::LowerSnake())
         );
         $this->assertEquals(
-            ['aaa_0' => 123, 'aaa_1' => 456, 'aaa_2' => 789], 
+            ['aaa_0' => 123, 'aaa_1' => 456, 'aaa_2' => 789],
             $defs->expandValues(['aaa_0', 'aaa_1', 'aaa_2'], 'aaa', [123, 456, 789], CaseSensor::LowerSnake())
         );
 
@@ -178,11 +178,11 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Domain\WrappedDomain::class, $defs);
         $this->assertEquals(
-            ['aaa_number' => Type::getType(Type::STRING)], 
+            ['aaa_number' => Type::getType(Type::STRING)],
             $defs->expandTypes(['aaa_number'], 'aaa', new Telephone('080-999-9999'), CaseSensor::LowerSnake())
         );
         $this->assertEquals(
-            ['aaa_number' => '080-999-9999'], 
+            ['aaa_number' => '080-999-9999'],
             $defs->expandValues(['aaa_number'], 'aaa', new Telephone('080-999-9999'), CaseSensor::LowerSnake())
         );
     }

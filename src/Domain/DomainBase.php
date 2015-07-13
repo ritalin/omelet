@@ -17,7 +17,7 @@ abstract class DomainBase
 
         if ($root) {
             $types = $this->flatten($types);
-            
+
             $diff = array_diff_key(array_flip($availableParams), $types);
             if (count($diff) > 0) {
                 throw new \RuntimeException(
@@ -25,7 +25,7 @@ abstract class DomainBase
                 );
             }
         }
-        
+
         return $types;
     }
 
@@ -35,7 +35,7 @@ abstract class DomainBase
 
         if ($root) {
             $values = $this->flatten($values);
-            
+
             $diff = array_diff_key(array_flip($availableParams), $values);
             if (count($diff) > 0) {
                 throw new \RuntimeException(
@@ -43,7 +43,7 @@ abstract class DomainBase
                 );
             }
         }
-        
+
         return $values;
     }
 

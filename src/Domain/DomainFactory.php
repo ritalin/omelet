@@ -94,7 +94,7 @@ final class DomainFactory
             $lookup
         );
     }
-    
+
     private function convertNames(array $fields, CaseSensor $sensor)
     {
         return array_map(
@@ -104,7 +104,7 @@ final class DomainFactory
             $fields
         );
     }
-    
+
     public function parseAsDomain($type, CaseSensor $sensor, $hasName)
     {
         $ref = new \ReflectionClass($type);
@@ -142,12 +142,12 @@ final class DomainFactory
                             }
                         );
                     }
-*/                  
+*/
                     $k = $sensor->convert($name);
-                    
+
                     return $tmp + [$k => new NamedAliasDomain(
-                        $domains[$name], $k, 
-                        isset($aliases[$name]) ? $this->convertNames($aliases[$name], $sensor) : [], 
+                        $domains[$name], $k,
+                        isset($aliases[$name]) ? $this->convertNames($aliases[$name], $sensor) : [],
                         null
                     )];
                 },
@@ -195,8 +195,8 @@ final class DomainFactory
                 );
 
                 return $tmp + [$f->name => new NamedAliasDomain(
-                    $domain, $sensor->convert($f->name), 
-                    $this->convertNames([ $alias ], $sensor), 
+                    $domain, $sensor->convert($f->name),
+                    $this->convertNames([ $alias ], $sensor),
                     $default,
                     array_flip($optFields)
                 )];
