@@ -56,13 +56,13 @@ abstract class CustomDomain extends DomainBase
     {
         return isset($this->optValues[$name]) ? $this->optValues[$name] : null;
     }
-
-    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
+    
+    protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         return [$name => Type::getType($this->type)];
     }
 
-    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
+    protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         return [$name => $this->value];
     }

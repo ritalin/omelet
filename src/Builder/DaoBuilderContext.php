@@ -91,7 +91,7 @@ class DaoBuilderContext
                     throw new \Exception("File not found: $path");
                 }
 
-                return $tmp + [$m->name => file_get_contents($path)];
+                return $tmp + [$m->name => str_replace("\r\n", "\n", file_get_contents($path))];
             },
             []
         );

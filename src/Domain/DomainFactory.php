@@ -8,6 +8,7 @@ use Omelet\Annotation\AnnotationConverterAdapter;
 use Omelet\Annotation\Entity;
 use Omelet\Annotation\ColumnType;
 use Omelet\Annotation\Column;
+use Omelet\Annotation\Alias;
 use Omelet\Annotation\ParamAlt;
 use Omelet\Util\CaseSensor;
 
@@ -93,22 +94,42 @@ final class DomainFactory
             $lookup
         );
     }
-
+    
+    private function convertNames(array $fields, CaseSensor $sensor)
+    {
+        return array_map(
+            function ($f) use ($sensor) {
+                return $sensor->convert($f);
+            },
+            $fields
+        );
+    }
+    
     public function parseAsDomain($type, CaseSensor $sensor, $hasName)
     {
         $ref = new \ReflectionClass($type);
         $reader = new AnnotationConverterAdapter($ref);
 
         $ctor = $ref->getConstructor();
-        $domains = $this->parseParamDomain($ctor->getParameters(), $reader->getMethodAnnotations($ctor), $sensor);
+        $annotations = $reader->getMethodAnnotations($ctor);
+        $domains = $this->parseParamDomain($ctor->getParameters(), $annotations, $sensor);
 
         if (! $hasName) {
             return new WrappedDomain($type, array_values($domains));
         }
         else {
+            $aliases = array_reduce(
+                $this->extractAnnotations($annotations, Alias::class),
+                function (array &$tmp, Alias $a) {
+                    return $tmp + [$a->name => $a->alias];
+                },
+                []
+            );
+
             $domains = array_reduce(
                 array_keys($domains),
-                function (array &$tmp, $name) use ($ref, $reader, $domains, $sensor) {
+                function (array &$tmp, $name) use ($ref, $reader, $domains, $aliases, $sensor) {
+/*
                     if (($m = $this->findGetterMethod($ref, $name)) === false) {
                         $alias = $default = null;
                     }
@@ -121,9 +142,13 @@ final class DomainFactory
                             }
                         );
                     }
-
-                    return $tmp + [$sensor->convert($name) => new NamedAliasDomain(
-                        $domains[$name], $sensor->convert($name), $sensor->convert($alias), $default
+*/                  
+                    $k = $sensor->convert($name);
+                    
+                    return $tmp + [$k => new NamedAliasDomain(
+                        $domains[$name], $k, 
+                        isset($aliases[$name]) ? $this->convertNames($aliases[$name], $sensor) : [], 
+                        null
                     )];
                 },
                 []
@@ -159,7 +184,7 @@ final class DomainFactory
                 $columnType = $this->extractAnnotation($annotations, ColumnType::class, function ($a) { return $a->type; });
                 list($alias, $default, $optFields) = $this->extractAnnotation(
                     $annotations, Column::class, function ($a) {
-                        return [ $a->alias, $a->default, $a->optFields ];
+                        return [ $a->name, $a->default, $a->optFields ];
                     }
                 );
                 $domain = $this->parseInternal($f->name, $columnType, $sensor, false);
@@ -170,7 +195,9 @@ final class DomainFactory
                 );
 
                 return $tmp + [$f->name => new NamedAliasDomain(
-                    $domain, $sensor->convert($f->name), $sensor->convert($alias), $default,
+                    $domain, $sensor->convert($f->name), 
+                    $this->convertNames([ $alias ], $sensor), 
+                    $default,
                     array_flip($optFields)
                 )];
             },

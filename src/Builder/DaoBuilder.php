@@ -15,7 +15,9 @@ use Omelet\Annotation\SequenceHint;
 
 use Omelet\Annotation\Dao;
 use Omelet\Annotation\Select;
+use Omelet\Annotation\Delete;
 use Omelet\Annotation\Returning;
+use Omelet\Annotation\Core\AbstractCommandAnnotation;
 
 use Omelet\Domain\DomainFactory;
 use Omelet\Domain\ArrayDomain;
@@ -311,7 +313,29 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             return '';
         }
     }
-
+    
+    private function getMethodByType($annotation, $returnDomain = null)
+    {
+        $type = get_class($annotation);
+        
+        switch (true) {
+            case $type === Select::class:
+                $class = ArrayDomain::class;
+                if ($returnDomain instanceof $class) {
+                    return [ 'fetchAll', [] ];
+                }
+                else {
+                    return [ 'fetchRow', [] ];
+                }
+            case is_subclass_of($type, AbstractCommandAnnotation::class):
+                return [ 'execute', ['returning' => $annotation->returning] ];
+            case $type === Delete::class:
+                return [ 'execute', [] ];
+            default:
+                throw new \LogicException("Unsupported command/Query annotation. ($type)");
+        }
+    }
+    
     private function methodTemplate(array $method)
     {
         $paramDefs = implode(', ',
@@ -335,32 +359,24 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             )
         );
         $returning = var_export($method['returnDomain'], true);
-
-        switch (get_class($method['type'])) {
-            case Select::class:
-                $class = ArrayDomain::class;
-                if ($method['returnDomain'] instanceof $class) {
-                    $caller = 'fetchAll';
-                }
-                else {
-                    $caller = 'fetchRow';
-                }
-                break;
-            default:
-                $caller = 'execute';
-                break;
-        }
-
+        
+        list($caller, $opts) = $this->getMethodByType($method['type'], $method['returnDomain']);
+        $opts = var_export($opts, true);
+        
         return
 "    public function {$methodName}({$paramDefs}) {
-        \$paramDomain = {$domain};
         \$params = [$params];
+        \$opts = $opts;
         \$returnDomain = {$returning};
+        
+        \$rows = \$this->{$caller}('$methodName', \$opts, function (\$paramNames) use (\$params) {
+            \$paramDomain = {$domain};
 
-        \$rows = \$this->{$caller}('$methodName',
-            \$paramDomain->expandValues('', \$params, \$this->paramFormatter),
-            \$paramDomain->expandTypes('', \$params, \$this->paramFormatter)
-        );
+            return [
+                \$paramDomain->expandValues(\$paramNames, '', \$params, \$this->paramFormatter), 
+                \$paramDomain->expandTypes(\$paramNames, '', \$params, \$this->paramFormatter)
+            ];
+        });
 
         return \$this->convertResults(\$rows, \$returnDomain);
     }"

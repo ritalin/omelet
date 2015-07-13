@@ -7,22 +7,44 @@ use Omelet\Util\CaseSensor;
 
 abstract class DomainBase
 {
-    abstract protected function expandTypesInternal($name, $val, CaseSensor $sensor);
-    abstract protected function expandValuesInternal($name, $val, CaseSensor $sensor);
+    abstract protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor);
+    abstract protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor);
     abstract protected function convertResultsInternal($results, AbstractPlatform $platform);
 
-    public function expandTypes($name, $val, CaseSensor $sensor, $root = true)
+    public function expandTypes(array $availableParams, $name, $val, CaseSensor $sensor, $root = true)
     {
-        $types = $this->expandTypesInternal($name, $val, $sensor);
+        $types = $this->expandTypesInternal($availableParams, $name, $val, $sensor);
 
-        return $root ? $this->flatten($types) : $types;
+        if ($root) {
+            $types = $this->flatten($types);
+            
+            $diff = array_diff_key(array_flip($availableParams), $types);
+            if (count($diff) > 0) {
+                throw new \RuntimeException(
+                    sprintf('All SQL parameter has not been bound (%s)', implode(',', array_keys($diff)))
+                );
+            }
+        }
+        
+        return $types;
     }
 
-    public function expandValues($name, $val, CaseSensor $sensor, $root = true)
+    public function expandValues(array $availableParams, $name, $val, CaseSensor $sensor, $root = true)
     {
-        $values = $this->expandValuesInternal($name, $val, $sensor);
+        $values = $this->expandValuesInternal($availableParams, $name, $val, $sensor);
 
-        return $root ? $this->flatten($values) : $values;
+        if ($root) {
+            $values = $this->flatten($values);
+            
+            $diff = array_diff_key(array_flip($availableParams), $values);
+            if (count($diff) > 0) {
+                throw new \RuntimeException(
+                    sprintf('All SQL parameter has not been bound (%s)', implode(',', array_keys($diff)))
+                );
+            }
+        }
+        
+        return $values;
     }
 
     public function convertResults($results, AbstractPlatform $platform)

@@ -3,18 +3,22 @@
 namespace Omelet\Tests\Target;
 
 use Omelet\Annotation\Column;
+use Omelet\Annotation\Alias;
 use Omelet\Annotation\Entity;
 
 class Todo
 {
     /**
-     * @Column(alias="todo_id")
+     * @Column(name="todo_id")
      *
      * @var integer
      */
     public $id;
 
     /**
+     * @Column(name="content")
+     * @Alias(name="content", alias={"text", "memo"})
+     *
      * @var string
      */
     public $todo;
@@ -32,7 +36,9 @@ class Todo
     public $hidden;
 
     /**
-     * @Column(alias="creator_id", optFields={"creator_name"})
+     * @Column(name="creator_id", optFields={"creator_name"})
+     * @Alias(name="creator_id", alias="maintener_id")
+     * @Alias(name="creator_name", alias="maintener_name")
      *
      * @var Editor
      */

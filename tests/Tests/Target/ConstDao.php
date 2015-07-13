@@ -6,7 +6,6 @@ use Omelet\Annotation\Dao;
 use Omelet\Annotation\Delete;
 use Omelet\Annotation\Insert;
 use Omelet\Annotation\Select;
-use Omelet\Annotation\Update;
 
 /**
  * @Dao(route="/")
@@ -26,4 +25,16 @@ interface ConstDao
      * @return Timestamp
      */
     public function now();
+
+    /**
+     * @Select
+     *
+     * @return Hidden
+     */
+    public function hidden(Hidden $hidden);
+    
+    /**
+     * @Command(returning={"value1", "value2"})
+     */
+    public function returnAsParam();
 }

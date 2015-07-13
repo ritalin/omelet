@@ -11,9 +11,15 @@ use Doctrine\Common\Annotations\Annotation\Target;
  */
 final class ParamAlt
 {
+    /**
+     * @var string
+     */
     public $type;
+    /**
+     * @var string
+     */
     public $name;
-
+    
     public static function __set_state($values)
     {
         $a = new self();

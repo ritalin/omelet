@@ -19,25 +19,29 @@ class ArrayDomain extends DomainBase
         $this->child = $child;
     }
 
-    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
+    protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         if (is_array($val) && count($val) === 0) {
             return [];
         }
 
         return $this->expand($name, $val, $sensor,
-            function ($k, $v) use ($sensor) { return $this->child->expandTypes($k, $v, $sensor); }
+            function ($k, $v) use ($availableParams, $sensor) { 
+                return $this->child->expandTypes($availableParams, $k, $v, $sensor, false); 
+            }
         );
     }
 
-    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
+    protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         if (is_array($val) && count($val) === 0) {
             return [];
         }
 
         return $this->expand($name, $val, $sensor,
-            function ($k, $v) use ($sensor) { return $this->child->expandValues($k, $v, $sensor); }
+            function ($k, $v) use ($availableParams, $sensor) { 
+                return $this->child->expandValues($availableParams, $k, $v, $sensor, false); 
+            }
         );
     }
 

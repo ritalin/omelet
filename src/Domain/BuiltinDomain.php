@@ -20,12 +20,12 @@ class BuiltinDomain extends DomainBase
         return $this->type;
     }
 
-    protected function expandTypesInternal($name, $val, CaseSensor $sensor)
+    protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         return [$name => Type::getType($this->type)];
     }
 
-    protected function expandValuesInternal($name, $val, CaseSensor $sensor)
+    protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
         return [$name => $val];
     }

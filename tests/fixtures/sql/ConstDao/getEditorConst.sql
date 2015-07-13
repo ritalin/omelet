@@ -1,1 +1,1 @@
-select 1024 as editor_id, 'Waaaah!!' as editor_name
+select 1024 as id, 'Waaaah!!' as name

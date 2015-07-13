@@ -6,3 +6,4 @@ tests/fixtures/sql/SwitchDao/findA.sql
 tests/fixtures/sql/SwitchDao/findB.sql
 tests/Target/SwitchDao.php
 tests/Tests/Target/SwitchDao/SwitchDao.php
+omelet.zip
