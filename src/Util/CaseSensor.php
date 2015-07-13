@@ -61,7 +61,7 @@ final class CaseSensor
 
         return $this->formatter->join(call_user_func_array('array_merge', $tokens));
     }
-    
+
     private function getSplitter($input)
     {
         if (strpos($input, '_') !== false) {

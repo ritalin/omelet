@@ -61,12 +61,12 @@ class DaoBuilder
      * @var CaseSensor
      */
     private $returnCaseSensor;
-    
+
     public function __construct(\ReflectionClass $intf, $className)
     {
         $this->intf = $intf;
         $this->className = $className;
-        
+
         $this->factory = new DomainFactory();
         $this->paramCaseSensor = $this->returnCaseSensor = CaseSensor::LowerSnake();
     }
@@ -132,11 +132,11 @@ class DaoBuilder
         $reader = new AnnotationReader();
 
         $commentParser = new AnnotationConverterAdapter($this->intf);
-        
+
         $annotations = $commentParser->getClassAnnotations();
         $this->config = $this->extractDaoClassConfig($annotations);
         $this->seqHint = $this->extractAnnotation($annotations, SequenceHint::class);
-        
+
         $this->methods = array_reduce(
             $this->intf->getMethods(),
             function (array &$tmp, \ReflectionMethod $m) use ($reader, $commentParser) {
@@ -259,9 +259,9 @@ class DaoBuilder
         if ($ns !== '') {
             $ns = "namespace {$ns};";
         }
-        
+
         $seqHint = var_export($this->seqHint, true);
-        
+
         return
 "<?php
 
@@ -277,18 +277,18 @@ use Doctrine\DBAL\Driver\Connection;
 
 class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
     const AccessRoute = '{$accessRoute}';
-    
+
     private \$paramFormatter;
-    
+
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
         \$hint = {$seqHint};
         \$seq = \$context
             ->getSequenceNameManager()
             ->findStrategy(\$conn->getDriver()->getName())
             ->resolve(\$hint);
-        
+
         \$this->paramFormatter = CaseSensor::{\$context->getConfig()->paramCaseSensor}();
-        
+
         parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'), empty(\$seq) ? null : \$seq);
     }
 %s
@@ -357,8 +357,8 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         \$params = [$params];
         \$returnDomain = {$returning};
 
-        \$rows = \$this->{$caller}('$methodName', 
-            \$paramDomain->expandValues('', \$params, \$this->paramFormatter), 
+        \$rows = \$this->{$caller}('$methodName',
+            \$paramDomain->expandValues('', \$params, \$this->paramFormatter),
             \$paramDomain->expandTypes('', \$params, \$this->paramFormatter)
         );
 

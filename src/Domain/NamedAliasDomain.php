@@ -61,9 +61,9 @@ class NamedAliasDomain extends DomainBase
     protected function expandTypesInternal($name, $val, CaseSensor $sensor)
     {
         $n = $sensor->convert($name, $this->name);
-        
+
         if ($val instanceof DomainBase) {
-            return  $val->expandTypes($n, $val, $sensor); 
+            return  $val->expandTypes($n, $val, $sensor);
         }
         else {
             return $this->domain->expandTypes($n, $val, $sensor);
@@ -73,9 +73,9 @@ class NamedAliasDomain extends DomainBase
     protected function expandValuesInternal($name, $val, CaseSensor $sensor)
     {
         $n = $sensor->convert($name, $this->name);
-        
+
         if ($val instanceof DomainBase) {
-            return  $val->expandValues($n, $val, $sensor); 
+            return  $val->expandValues($n, $val, $sensor);
         }
         else {
             return $this->domain->expandValues($n, $val, $sensor);

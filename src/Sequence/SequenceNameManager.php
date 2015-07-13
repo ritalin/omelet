@@ -12,15 +12,15 @@ class SequenceNameManager
      * @var SequenceNameStrategyInterface[]
      */
     private $cache = [];
-    
+
     public function __construct()
     {
         $this->classMap = [
-            'pdo_sqlite' => SqliteSequenceStrategy::class, 
+            'pdo_sqlite' => SqliteSequenceStrategy::class,
             'default' => DefaultSequenceStrategy::class
         ];
     }
-    
+
     public function findStrategy($driverName)
     {
         if ($driverName !== null) {
@@ -31,10 +31,10 @@ class SequenceNameManager
         if (($strategy = $this->findStrategyInternal('default')) !== false) {
             return $strategy;
         }
-        
+
         throw new \LogicException('Unknown driver name');
     }
-    
+
     private function findStrategyInternal($driverName)
     {
         if (isset($this->classMap[$driverName])) {
@@ -45,11 +45,11 @@ class SequenceNameManager
                 $class = $this->classMap[$driverName];
                 $strategy = new $class();
                 $this->cache[$driverName] = $strategy;
-                
+
                 return $strategy;
             }
         }
-        
+
         return false;
     }
 }

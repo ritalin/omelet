@@ -26,7 +26,7 @@ class DaoBase
         $this->queries = $queries;
         $this->seqName = $seqName;
     }
-    
+
     /**
      * @return string
      */
@@ -34,7 +34,7 @@ class DaoBase
     {
         return $this->seqName;
     }
-    
+
     /**
      * @return string
      */
@@ -42,7 +42,7 @@ class DaoBase
     {
         return $this->conn->lastInsertId($this->seqName);
     }
-    
+
     protected function fetchAll($key, array $params, array $types)
     {
         return $this->conn->fetchAll($this->queries[$key], $params, $types);

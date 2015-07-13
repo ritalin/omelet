@@ -40,6 +40,7 @@ $config = Symfony\CS\Config\Config::create()
         '-unary_operators_spaces',
         '-single_line_after_imports',
         '-remove_lines_between_uses',
+//        '-braces',
     ]
 );
 return $config;

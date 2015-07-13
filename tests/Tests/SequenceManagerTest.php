@@ -15,11 +15,11 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
     public function test_sqlite_strategy()
     {
         $hint = new SequenceHint();
-        
+
         $strategy = new SqliteSequenceStrategy();
         $this->assertNull($strategy->resolve($hint));
     }
-    
+
     /**
      * @test
      */
@@ -27,11 +27,11 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
     {
         $hint = new SequenceHint();
         $hint->table = 'aaa';
-        
+
         $strategy = new SqliteSequenceStrategy();
         $this->assertEquals('aaa', $strategy->resolve($hint));
     }
-    
+
     /**
      * @test
      */
@@ -40,11 +40,11 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
         $hint = new SequenceHint();
         $hint->table = 'aaa';
         $hint->column = 'id';
-        
+
         $strategy = new SqliteSequenceStrategy();
         $this->assertEquals('aaa', $strategy->resolve($hint));
     }
-    
+
     /**
      * @test
      */
@@ -52,11 +52,11 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
     {
         $hint = new SequenceHint();
         $hint->name = 'aaa_id_seq';
-        
+
         $strategy = new SqliteSequenceStrategy();
         $this->assertNull($strategy->resolve($hint));
     }
-    
+
     /**
      * @test
      */
@@ -66,7 +66,7 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
         $hint->table = 'aaa';
         $hint->column = 'id';
         $hint->name = 'aaa_id_seq';
-        
+
         $strategy = new SqliteSequenceStrategy();
         $this->assertEquals('aaa', $strategy->resolve($hint));
     }
@@ -77,7 +77,7 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
     public function test_default_strategy()
     {
         $hint = new SequenceHint();
-        
+
         $strategy = new DefaultSequenceStrategy();
         $this->assertNull($strategy->resolve($hint));
     }
@@ -89,7 +89,7 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
     {
         $hint = new SequenceHint();
         $hint->table = 'aaa';
-        
+
         $strategy = new DefaultSequenceStrategy();
         $this->assertNull($strategy->resolve($hint));
     }
@@ -101,7 +101,7 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
     {
         $hint = new SequenceHint();
         $hint->column = 'id';
-        
+
         $strategy = new DefaultSequenceStrategy();
         $this->assertNull($strategy->resolve($hint));
     }
@@ -114,7 +114,7 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
         $hint = new SequenceHint();
         $hint->table = 'aaa';
         $hint->column = 'id';
-        
+
         $strategy = new DefaultSequenceStrategy();
         $this->assertEquals('aaa_id_seq', $strategy->resolve($hint));
     }
@@ -126,7 +126,7 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
     {
         $hint = new SequenceHint();
         $hint->name = 'seq_aaa';
-        
+
         $strategy = new DefaultSequenceStrategy();
         $this->assertEquals('seq_aaa', $strategy->resolve($hint));
     }
@@ -140,7 +140,7 @@ class SequenceManagerTest extends \PHPUnit_Framework_TestCase
         $hint->table = 'aaa';
         $hint->column = 'id';
         $hint->name = 'seq_aaa';
-        
+
         $strategy = new DefaultSequenceStrategy();
         $this->assertEquals('seq_aaa', $strategy->resolve($hint));
     }

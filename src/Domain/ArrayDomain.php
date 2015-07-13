@@ -13,7 +13,7 @@ class ArrayDomain extends DomainBase
      * @var DomainBase
      */
     private $child;
-    
+
     public function __construct(DomainBase $child)
     {
         $this->child = $child;

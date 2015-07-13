@@ -2,7 +2,6 @@
 
 namespace Omelet\Tests;
 
-use Doctrine\DBAL\Types;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Annotations\AnnotationReader;
 
@@ -117,7 +116,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
             $defs->expandTypes('', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
         );
         $this->assertEquals(
-            ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], 
+            ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'],
             $defs->expandValues('', ['f1' => '123', 'f2' => '456', 'f3' => 'qwy'], CaseSensor::LowerSnake())
         );
 

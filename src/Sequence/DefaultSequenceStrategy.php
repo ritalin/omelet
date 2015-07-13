@@ -19,7 +19,7 @@ class DefaultSequenceStrategy implements SequenceNameStrategyInterface
                 return "{$hint->table}_{$hint->column}_seq";
             }
         }
-        
+
         return null;
     }
 }

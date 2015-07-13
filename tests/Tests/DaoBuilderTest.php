@@ -804,7 +804,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(['CreatorName'], $children['creator']->getOptFields());
         }
     }
-    
+
     /**
      * @test
      */
@@ -814,7 +814,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
 //        $logger = new \Doctrine\DBAL\Logging\EchoSQLLogger();
         $dao = $this->exportDao(TodoDao2::class, $logger);
         $this->assertNull($dao->sequenceName());
-        
+
         $dao = $this->exportDao(TodoDao3::class, $logger);
         $this->assertEquals('todo', $dao->sequenceName());
     }

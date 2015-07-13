@@ -42,7 +42,7 @@ class BuildWatchTest extends \PHPUnit_Framework_TestCase
         if (! file_exists(self::daoRoot)) {
             mkdir(self::daoRoot, 0777, true);
         }
-        
+
         $daoFile = __DIR__ . '/Target/SwitchDao/SwitchDao';
         $lockFile = self::daoRoot . '/lockDao';
         if (file_exists("{$lockFile}_1")) {

@@ -20,7 +20,7 @@ class DaoBuilderContext
      * @var ChangeWatcher
      */
     private $watcher;
-    
+
     /**
      * @var SequenceNameManager
      */
@@ -33,7 +33,7 @@ class DaoBuilderContext
 
         $this->watcher = new ChangeWatcher($this->config->daoClassPath, WatchMode::{$this->config->watchMode}());
         $this->sequenceManager = new SequenceNameManager();
-        
+
         $this->registerClassLoader();
     }
 
