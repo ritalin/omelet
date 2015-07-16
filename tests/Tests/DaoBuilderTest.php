@@ -608,7 +608,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function test_prepare_dao_clss_annottion()
+    public function test_prepare_dao_class_annottion()
     {
         $context = new DaoBuilderContext(new Configuration(
             function ($conf) { $conf->connectionString = 'sqlite:///:memory:'; }
@@ -712,7 +712,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1024, $results->getId());
         $this->assertEquals('Waaaah!!', $results->getName());
     }
-
+    
     /**
      * @test
      */

@@ -200,14 +200,17 @@ class DaoBuilder
 
     private function returningToDomain(array $attrs, AnnotationReader $reader)
     {
-        if ($this->extractAnnotation($attrs, Select::class) !== null) {
-            $returning = $this->extractAnnotation($attrs, Returning::class);
-
-            return $this->factory->parse('', isset($returning) ? $returning->type : 'array', $this->returnCaseSensor);
+        if (($a = $this->extractAnnotation($attrs, Select::class)) !== null) {
+            return $this->factory->parse('', isset($returning) ? $a->type : 'array', $this->returnCaseSensor);
         }
-        else {
-            return $this->factory->parse('', 'int', $this->returnCaseSensor);
+        elseif (($a = $this->extractAnnotation($attrs, AbstractCommandAnnotation::class)) !== null) {
+            if ($a->returning != null) {
+                return $this->factory->parse('', 'array', $this->returnCaseSensor);
+            }
         }
+        
+        // else
+        return $this->factory->parse('', 'int', $this->returnCaseSensor);
     }
 
     private function extractParamDefs(array $attrs)
@@ -285,6 +288,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
     const AccessRoute = '{$accessRoute}';
 
     private \$paramFormatter;
+    private \$returnFormatter;
 
     public function __construct(Connection \$conn, DaoBuilderContext \$context) {
         \$hint = {$seqHint};
@@ -294,6 +298,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             ->resolve(\$hint);
 
         \$this->paramFormatter = CaseSensor::{\$context->getConfig()->paramCaseSensor}();
+        \$this->returnFormatter = CaseSensor::{\$context->getConfig()->returnCaseSensor}();
 
         parent::__construct(\$conn, \$context->queriesOf('\\{$this->intf->name}'), empty(\$seq) ? null : \$seq);
     }
@@ -317,7 +322,34 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             return '';
         }
     }
-
+    
+    private function parseReturning(array $names)
+    {
+        if (is_int(key($names))) {
+            throw new \LogicException('Type name is not specified. (returning={<name>"="<type>", ...})');
+        }
+        
+        $types = [
+            'int' => \PDO::PARAM_INT,
+            'string' => \PDO::PARAM_STR,
+        ];
+        $defaultLen = [
+            'int' => strlen((string)PHP_INT_MAX)+1,
+            'string' => 1024,
+        ];
+        
+        $pattern = '/^(?<type>.+?)(\((?<length>\d+)\))?$/';
+        
+        return array_map(
+            function ($type) use ($pattern, $types, $defaultLen) {
+                if (preg_match_all($pattern, $type, $m) !== false) {
+                    return ['type' => $types[$m['type'][0]], 'length' => $m['length'][0] !== '' ? (int)$m['length'][0] : $defaultLen[$m['type'][0]] ];
+                }
+            },
+            $names
+        );
+    }
+    
     private function getMethodByType($annotation, $returnDomain = null)
     {
         $type = get_class($annotation);
@@ -332,7 +364,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
                     return ['fetchRow', []];
                 }
             case is_subclass_of($type, AbstractCommandAnnotation::class):
-                return ['execute', ['returning' => $annotation->returning]];
+                return ['execute', ['returning' => $this->parseReturning($annotation->returning)]];
             case $type === Delete::class:
                 return ['execute', []];
             default:
@@ -382,7 +414,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
             ];
         });
 
-        return \$this->convertResults(\$rows, \$returnDomain);
+        return \$this->convertResults(\$rows, \$returnDomain, \$this->returnFormatter);
     }"
         ;
     }

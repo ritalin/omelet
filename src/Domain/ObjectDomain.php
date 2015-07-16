@@ -47,7 +47,7 @@ class ObjectDomain extends DomainBase
         );
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
         if ($results === false) {
             return null;
@@ -62,7 +62,7 @@ class ObjectDomain extends DomainBase
         $obj = new $class();
 
         foreach ($this->fields as $name => $domain) {
-            $obj->{$name} = $domain->convertResults($results, $platform);
+            $obj->{$name} = $domain->convertResults($results, $platform, $sensor);
         }
 
         return $obj;

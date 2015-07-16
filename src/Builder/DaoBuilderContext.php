@@ -71,6 +71,23 @@ class DaoBuilderContext
     {
         return $this->sequenceManager;
     }
+    
+    private function findQueryPath($rootDir, $methodName, $dialect)
+    {
+        if ($dialect !== null) {
+            $path = $rootDir . "/$methodName.$dialect.sql";
+            if (is_readable($path)) {
+                return $path;
+            }
+        }
+        
+        $path = $rootDir . "/$methodName.sql";
+        if (is_readable($path)) {
+            return $path;
+        }
+
+        return;
+    }
     /**
      * @param string intfName
      */
@@ -86,11 +103,11 @@ class DaoBuilderContext
         return array_reduce(
             $t->getMethods(),
             function (array &$tmp, $m) use ($rootDir) {
-                $path = $rootDir . "/{$m->name}.sql";
-                if (! is_readable($path)) {
-                    throw new \Exception("File not found: $path");
+                $path = $this->findQueryPath($rootDir, $m->name, $this->config->dialect);
+                if ($path == null) {
+                    throw new \Exception("Query not found: $className/{$m->name}");
                 }
-
+                
                 return $tmp + [$m->name => str_replace("\r\n", "\n", file_get_contents($path))];
             },
             []

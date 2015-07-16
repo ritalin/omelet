@@ -63,16 +63,19 @@ class ArrayDomain extends DomainBase
         return $this->child;
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
+/*
         if (($this->child instanceof BuiltinDomain) && ($this->child->getType() === Type::STRING)) {
             return $results;
         }
-
+*/
         return array_reduce(
             array_keys($results),
-            function (array &$tmp, $k) use ($results, $platform) {
-                return $tmp + [$k => $this->child->convertResults($results[$k], $platform)];
+            function (array &$tmp, $k) use ($results, $platform, $sensor) {
+                $n = $sensor->convert($k);
+                
+                return $tmp + [$n => $this->child->convertResults($results[$k], $platform, $sensor)];
             },
             []
         );

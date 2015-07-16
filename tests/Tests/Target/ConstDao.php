@@ -32,9 +32,4 @@ interface ConstDao
      * @return Hidden
      */
     public function hidden(Hidden $hidden);
-
-    /**
-     * @Command(returning={"value1", "value2"})
-     */
-    public function returnAsParam();
 }

@@ -5,6 +5,7 @@ namespace Omelet\Core;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Connection as ConnectionDriver;
 use Omelet\Domain\DomainBase;
+use Omelet\Util\CaseSensor;
 
 class DaoBase
 {
@@ -46,52 +47,69 @@ class DaoBase
 
     protected function fetchAll($key, array $options, callable $paramCollecter)
     {
-        list($stmt, ) = $this->executeQuery($this->queries[$key], $options, $paramCollecter);
-
-        return $stmt->fetchAll();
+        return $this->executeQuery($this->queries[$key], $options, $paramCollecter,
+            function ($stmt, $outValues) {
+                return $stmt->fetchAll();
+            }
+        );
     }
 
     protected function fetchRow($key, array $options, callable $paramCollecter)
     {
-        list($stmt, ) = $this->executeQuery($this->queries[$key], $options, $paramCollecter);
-
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $this->executeQuery($this->queries[$key], $options, $paramCollecter,
+            function ($stmt, $outValues) {
+                return $stmt->fetch(\PDO::FETCH_ASSOC);
+            }
+        );
     }
 
     protected function execute($key, array $options, callable $paramCollecter)
     {
-        list($stmt, $outParams) = $this->executeQuery($this->queries[$key], $options, $paramCollecter);
-
-        if (count($outParams) > 0) {
-            return $outParams;
-        }
-        else {
-            return $stmt->rowCount();
-        }
+        return $this->executeQuery($this->queries[$key], $options, $paramCollecter,
+            function ($stmt, $outValues) {
+                if (count($outValues) > 0) {
+                    return $outParams;
+                }
+                elseif ($rows = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                    return $rows;
+                }
+                else {
+                    return $stmt->rowCount();
+                }
+            }
+        );
     }
 
-    protected function executeQuery($query, array $options, callable $paramCollecter)
+    protected function executeQuery($query, array $options, callable $paramCollecter, callable $afterExecute)
     {
         $paramPositions = $this->extractParameterPsitions($query);
 
         $outNames = isset($options['returning']) ? $options['returning'] : [];
 
-        list($params, $types) = $paramCollecter(array_diff($paramPositions, $outNames));
-        list($query, $params, $types, $outParams) = $this->expandListParameters($query, $paramPositions, $params, $types, array_flip($outNames));
+        list($params, $types) = $paramCollecter(array_diff_key($paramPositions, $outNames));
+        list($query, $params, $types, $nameRevIndex) = $this->expandListParameters($query, $paramPositions, $params, $types, $outNames ?: []);
 
         $stmt = $this->prepare($query, $params, $types);
-
-        if (count($outParams) > 0) {
-            // bind output parameters
-            foreach ($outParams as $i => $p) {
-                $stmt->bindParam($i, $outParams[$i]);
+        
+        $outParams = [];
+        
+        if (count($outNames) > 0) {
+            // bind as parameters
+            foreach ($outNames as $name => $p) {
+                if (isset($nameRevIndex[$name])) {
+                    $i = $nameRevIndex[$name];
+                    $outParams[$name] = null;
+                    
+                    $stmt->bindParam($i, $outParams[$name], ($p['type'] | \PDO::PARAM_INPUT_OUTPUT), $p['length']);
+                }
             }
-            $stmt->setFetchMode(PDO::FETCH_BOUND);
+            
+            $stmt->setFetchMode(\PDO::FETCH_BOUND);
         }
 
         $stmt->execute();
-
-        return [ $stmt, &$outParams ];
+        
+        return $afterExecute($stmt, $outParams);
     }
 
     private function extractParameterPsitions($query)
@@ -105,11 +123,13 @@ class DaoBase
         $queryOffset = 0;
         $typesOrd    = [];
         $paramsOrd   = [];
-        $outParamsOrd = [];
+        $nameRevIndex = []; // Name -> Index Array
 
         foreach ($paramPositions as $pos => $paramName) {
             $paramLen = strlen($paramName) + 1;
             $value    = $params[$paramName];
+            $nameRevIndex[$paramName] = $paramIndex;
+            
             if (in_array($types[$paramName]->getBindingType(), [Connection::PARAM_INT_ARRAY, Connection::PARAM_STR_ARRAY])) {
                 $count      = count($value);
                 $expandStr  = $count > 0 ? implode(', ', array_fill(0, $count, '?')) : 'NULL';
@@ -126,27 +146,18 @@ class DaoBase
                 $query        = substr($query, 0, $pos) . $expandStr . substr($query, ($pos + $paramLen));
             }
             else {
-                if (isset($outParamNames[$paramName])) {
-                    $pos         += $queryOffset;
-                    $name = $paramName;
+                $pos         += $queryOffset;
+                $queryOffset -= ($paramLen - 1);
 
-                    $outParamsOrd[$paramName] = '';
-                }
-                else {
-                    $pos         += $queryOffset;
-                    $queryOffset -= ($paramLen - 1);
-                    $name = '?';
+                $paramsOrd[$paramIndex]  = $value;
+                $typesOrd[$paramIndex]   = $types[$paramName];
+                $query = substr($query, 0, $pos) . '?' . substr($query, ($pos + $paramLen));
 
-                    $paramsOrd[$paramIndex]  = $value;
-                    $typesOrd[$paramIndex]   = $types[$paramName];
-                }
-
-                $query = substr($query, 0, $pos) . $name . substr($query, ($pos + $paramLen));
                 ++$paramIndex;
             }
         }
 
-        return [ $query, $paramsOrd, $typesOrd, $outParamsOrd ];
+        return [ $query, $paramsOrd, $typesOrd, $nameRevIndex ];
     }
 
     private function prepare($query, $params, $types)
@@ -166,8 +177,8 @@ class DaoBase
         return $stmt;
     }
 
-    protected function convertResults($results, DomainBase $domain)
+    protected function convertResults($results, DomainBase $domain, CaseSensor $sensor)
     {
-        return $domain->convertResults($results, $this->conn->getDatabasePlatform());
+        return $domain->convertResults($results, $this->conn->getDatabasePlatform(), $sensor);
     }
 }

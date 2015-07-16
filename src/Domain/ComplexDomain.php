@@ -50,7 +50,7 @@ class ComplexDomain extends DomainBase
         );
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
         return $results;
     }

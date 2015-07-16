@@ -21,7 +21,11 @@ final class Configuration
      * @var string
      */
     public $connectionString = '';
-
+    /**
+     * @var string
+     */
+    public $dialect = null;
+    
     /**
      * @var string
      */

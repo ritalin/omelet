@@ -37,7 +37,7 @@ class WrappedDomain extends DomainBase
         return current($this->fieldDomains)->expandValues($availableParams, $name, $val, $sensor, false);
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
         if (is_array($results) && is_int(key($results))) {
             $results = current($results);
@@ -48,8 +48,8 @@ class WrappedDomain extends DomainBase
             if (is_int(key($results))) {
                 $domains = array_values($this->fieldDomains);
                 $values = array_map(
-                    function ($i) use ($results, $domains, $platform) {
-                        return isset($results[$i]) ? $domains[$i]->convertResults([ $results[$i] ], $platform) : null;
+                    function ($i) use ($results, $domains, $platform, $sensor) {
+                        return isset($results[$i]) ? $domains[$i]->convertResults([ $results[$i] ], $platform, $sensor) : null;
                     },
                     range(0, count($domains))
                 );
@@ -57,8 +57,8 @@ class WrappedDomain extends DomainBase
             else {
                 $domains = $this->fieldDomains;
                 $values = array_map(
-                    function ($name) use ($results, $domains, $platform) {
-                        return isset($results[$name]) ? $domains[$name]->convertResults($results, $platform) : null;
+                    function ($name) use ($results, $domains, $platform, $sensor) {
+                        return isset($results[$name]) ? $domains[$name]->convertResults($results, $platform, $sensor) : null;
                     },
                     array_keys($domains)
                 );
@@ -70,7 +70,7 @@ class WrappedDomain extends DomainBase
                 $value = $results;
             }
             else {
-                $value = $d->convertResults([ $results ], $platform);
+                $value = $d->convertResults([ $results ], $platform, $sensor);
             }
 
             return $ref->newInstance($value);

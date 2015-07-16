@@ -9,7 +9,7 @@ abstract class DomainBase
 {
     abstract protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor);
     abstract protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor);
-    abstract protected function convertResultsInternal($results, AbstractPlatform $platform);
+    abstract protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor);
 
     public function expandTypes(array $availableParams, $name, $val, CaseSensor $sensor, $root = true)
     {
@@ -47,9 +47,9 @@ abstract class DomainBase
         return $values;
     }
 
-    public function convertResults($results, AbstractPlatform $platform)
+    public function convertResults($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
-        return $this->convertResultsInternal($results, $platform);
+        return $this->convertResultsInternal($results, $platform, $sensor);
     }
 
     private function flatten(array $a)

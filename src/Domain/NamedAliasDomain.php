@@ -101,10 +101,10 @@ class NamedAliasDomain extends DomainBase
         }
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
         return $this->domain->convertResults(
-            [ $this->getValues($results) ], $platform
+            [ $this->getValues($results) ], $platform, $sensor
         );
     }
 

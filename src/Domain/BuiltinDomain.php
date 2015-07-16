@@ -30,7 +30,7 @@ class BuiltinDomain extends DomainBase
         return [$name => $val];
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
         if (is_array($results)) {
             $results = current($results);

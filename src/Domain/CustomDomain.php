@@ -67,7 +67,7 @@ abstract class CustomDomain extends DomainBase
         return [$name => $this->value];
     }
 
-    protected function convertResultsInternal($results, AbstractPlatform $platform)
+    protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
     }
 }
