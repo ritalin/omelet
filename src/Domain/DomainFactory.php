@@ -41,7 +41,7 @@ final class DomainFactory
         }
 
         if ($type === Types\Type::TARRAY) {
-            return new ArrayDomain(new BuiltinDomain(Types\Type::STRING));
+            return new AnyArrayDomain(new BuiltinDomain(Types\Type::STRING));
         }
 
         if (Types\Type::hasType($type)) {

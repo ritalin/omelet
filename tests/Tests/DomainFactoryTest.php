@@ -100,7 +100,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
 
         $t = Type::getType(Type::STRING);
 
-        $this->assertInstanceOf(Domain\ArrayDomain::class, $defs);
+        $this->assertInstanceOf(Domain\AnyArrayDomain::class, $defs);
         $this->assertInstanceOf(Domain\BuiltinDomain::class, $defs->childDomain());
         $this->assertEquals(Type::STRING, $defs->childDomain()->getType());
         $this->assertEquals([$t, $t, $t], $defs->expandTypes([0, 1, 2], '', ['123', '456', 'qwy'], CaseSensor::LowerSnake()));

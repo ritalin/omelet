@@ -58,7 +58,7 @@ class WrappedDomain extends DomainBase
                 $domains = $this->fieldDomains;
                 $values = array_map(
                     function ($name) use ($results, $domains, $platform, $sensor) {
-                        return isset($results[$name]) ? $domains[$name]->convertResults($results, $platform, $sensor) : null;
+                        return $domains[$name]->convertResults($results, $platform, $sensor);
                     },
                     array_keys($domains)
                 );

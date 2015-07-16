@@ -372,8 +372,9 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
 
             $this->assertArrayHasKey('returnDomain', $info);
             $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
-            $this->assertInstanceOf(Domain\BuiltinDomain::class, $info['returnDomain']->childDomain());
-            $this->assertEquals(Type::STRING, $info['returnDomain']->childDomain()->getType());
+            $this->assertInstanceOf(Domain\AnyArrayDomain::class, $info['returnDomain']->childDomain());
+            $this->assertInstanceOf(Domain\BuiltinDomain::class, $info['returnDomain']->childDomain()->childDomain());
+            $this->assertEquals(Type::STRING, $info['returnDomain']->childDomain()->childDomain()->getType());
         }
         listAll: {
             $info = $methods['listAll'];
@@ -389,7 +390,7 @@ class DaoBuilderTest extends \PHPUnit_Framework_TestCase
             $actial = $factory->parse('', Todo::class, CaseSensor::LowerSnake());
 
             $this->assertArrayHasKey('returnDomain', $info);
-            $this->assertInstanceOf(Domain\ArrayDomain::class, $info['returnDomain']);
+            $this->assertInstanceOf(Domain\AnyArrayDomain::class, $info['returnDomain']);
             $this->assertInstanceOf(Domain\BuiltinDomain::class, $info['returnDomain']->childDomain());
             $this->assertEquals(Type::STRING, $info['returnDomain']->childDomain()->getType());
         }

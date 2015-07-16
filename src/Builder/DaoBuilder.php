@@ -200,8 +200,10 @@ class DaoBuilder
 
     private function returningToDomain(array $attrs, AnnotationReader $reader)
     {
-        if (($a = $this->extractAnnotation($attrs, Select::class)) !== null) {
-            return $this->factory->parse('', isset($returning) ? $a->type : 'array', $this->returnCaseSensor);
+        if ($this->extractAnnotation($attrs, Select::class) !== null) {
+            $returning = $this->extractAnnotation($attrs, Returning::class);
+
+            return $this->factory->parse('', isset($returning) ? $returning->type : 'array[]', $this->returnCaseSensor);
         }
         elseif (($a = $this->extractAnnotation($attrs, AbstractCommandAnnotation::class)) !== null) {
             if ($a->returning != null) {
@@ -323,8 +325,12 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         }
     }
     
-    private function parseReturning(array $names)
+    private function parseReturning(array $names = null)
     {
+        if ($names === null) {
+            return [];
+        }
+        
         if (is_int(key($names))) {
             throw new \LogicException('Type name is not specified. (returning={<name>"="<type>", ...})');
         }
@@ -356,8 +362,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
 
         switch (true) {
             case $type === Select::class:
-                $class = ArrayDomain::class;
-                if ($returnDomain instanceof $class) {
+                if ($returnDomain instanceof ArrayDomain) {
                     return ['fetchAll', []];
                 }
                 else {

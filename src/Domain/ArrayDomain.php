@@ -65,11 +65,16 @@ class ArrayDomain extends DomainBase
 
     protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)
     {
-/*
-        if (($this->child instanceof BuiltinDomain) && ($this->child->getType() === Type::STRING)) {
-            return $results;
-        }
-*/
+        return array_map(
+            function ($v) use ($platform, $sensor) {
+                return $this->child->convertResults($v, $platform, $sensor);
+            },
+            $results
+        );
+    }
+    
+    private function convertResultBuiltin($results, AbstractPlatform $platform, CaseSensor $sensor)
+    {
         return array_reduce(
             array_keys($results),
             function (array &$tmp, $k) use ($results, $platform, $sensor) {
@@ -80,7 +85,7 @@ class ArrayDomain extends DomainBase
             []
         );
     }
-
+    
     public static function __set_state($values)
     {
         return new ArrayDomain($values['child']);
