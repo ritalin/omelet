@@ -147,13 +147,15 @@ class DaoBuilder
             $this->intf->getMethods(),
             function (array &$tmp, \ReflectionMethod $m) use ($reader, $commentParser) {
                 $attrs = $commentParser->getMethodAnnotations($m);
-
+                $returnTypes = $this->parseReturning($this->extractAnnotation($attrs, AbstractCommandAnnotation::class));
+                
                 return $tmp + [$m->name => [
                     'name' => $m->name,
                     'type' => $this->extractAnnotation($attrs, DaoAnnotation::class),
                     'params' => $m->getParameters(),
                     'paramDomain' => $this->paramToDomain($m->getParameters(), $attrs, $reader),
-                    'returnDomain' => $this->returningToDomain($attrs, $reader),
+                    'returnDomain' => $this->returningToDomain($returnTypes, $attrs, $reader),
+                    'returnTypes' => $returnTypes,
                 ]];
             },
             []
@@ -198,16 +200,16 @@ class DaoBuilder
         return new ComplexDomain($domains);
     }
 
-    private function returningToDomain(array $attrs, AnnotationReader $reader)
+    private function returningToDomain(array $returnTypes, array $attrs, AnnotationReader $reader)
     {
         if ($this->extractAnnotation($attrs, Select::class) !== null) {
             $returning = $this->extractAnnotation($attrs, Returning::class);
 
             return $this->factory->parse('', isset($returning) ? $returning->type : 'array[]', $this->returnCaseSensor);
         }
-        elseif (($a = $this->extractAnnotation($attrs, AbstractCommandAnnotation::class)) !== null) {
-            if ($a->returning != null) {
-                return $this->factory->parse('', 'array', $this->returnCaseSensor);
+        elseif ($this->extractAnnotation($attrs, AbstractCommandAnnotation::class) !== null) {
+            if (count($returnTypes) > 0) {
+                return $this->factory->parse('', count($returnTypes) === 1 ? current($returnTypes)['typeName'] : 'array', $this->returnCaseSensor);
             }
         }
         
@@ -325,9 +327,9 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         }
     }
     
-    private function parseReturning(array $names = null)
+    private function parseReturning(AbstractCommandAnnotation $annotation = null)
     {
-        if ($names === null) {
+        if ($annotation === null || ($names = $annotation->returning) == null) {
             return [];
         }
         
@@ -346,17 +348,29 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         
         $pattern = '/^(?<type>.+?)(\((?<length>\d+)\))?$/';
         
-        return array_map(
-            function ($type) use ($pattern, $types, $defaultLen) {
+        return array_reduce(
+            array_keys($names),
+            function (array &$tmp, $name) use ($names, $pattern, $types, $defaultLen) {
+                $type = $names[$name];
+                
                 if (preg_match_all($pattern, $type, $m) !== false) {
-                    return ['type' => $types[$m['type'][0]], 'length' => $m['length'][0] !== '' ? (int)$m['length'][0] : $defaultLen[$m['type'][0]] ];
+                    return $tmp + [
+                        $this->paramCaseSensor->convert($name) => [
+                            'typeName' => $m['type'][0],
+                            'type' => $types[$m['type'][0]], 
+                            'length' => $m['length'][0] !== '' ? (int)$m['length'][0] : $defaultLen[$m['type'][0]] 
+                        ]
+                    ];
+                }
+                else {
+                    return $tmp;
                 }
             },
-            $names
+            []
         );
     }
     
-    private function getMethodByType($annotation, $returnDomain = null)
+    private function getMethodByType($annotation, $returnDomain = null, array $returnTypes = null)
     {
         $type = get_class($annotation);
 
@@ -369,7 +383,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
                     return ['fetchRow', []];
                 }
             case is_subclass_of($type, AbstractCommandAnnotation::class):
-                return ['execute', ['returning' => $this->parseReturning($annotation->returning)]];
+                return ['execute', ['returning' => $returnTypes]];
             case $type === Delete::class:
                 return ['execute', []];
             default:
@@ -401,7 +415,7 @@ class {$name} extends DaoBase implements \\{$this->getInterfaceName()} {
         );
         $returning = var_export($method['returnDomain'], true);
 
-        list($caller, $opts) = $this->getMethodByType($method['type'], $method['returnDomain']);
+        list($caller, $opts) = $this->getMethodByType($method['type'], $method['returnDomain'], $method['returnTypes']);
         $opts = var_export($opts, true);
 
         return
