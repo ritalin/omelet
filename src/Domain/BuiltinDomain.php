@@ -22,12 +22,12 @@ class BuiltinDomain extends DomainBase
 
     protected function expandTypesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
-        return [$name => Type::getType($this->type)];
+        return [$sensor->convert($name) => Type::getType($this->type)];
     }
 
     protected function expandValuesInternal(array $availableParams, $name, $val, CaseSensor $sensor)
     {
-        return [$name => $val];
+        return [$sensor->convert($name) => $val];
     }
 
     protected function convertResultsInternal($results, AbstractPlatform $platform, CaseSensor $sensor)

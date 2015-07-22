@@ -29,6 +29,10 @@ final class DomainFactory
 
     public function parseInternal($name, $type, CaseSensor $sensor, $hasName)
     {
+        if ($type === 'null') {
+            return new VoidDomain();
+        }
+        
         if (($type === null) || ($type === '')) {
             $type = Types\Type::STRING;
         }

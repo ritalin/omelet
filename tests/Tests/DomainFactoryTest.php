@@ -4,6 +4,7 @@ namespace Omelet\Tests;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 
 use Omelet\Domain;
 use Omelet\Domain\DomainFactory;
@@ -20,6 +21,21 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function test_void_domain()
+    {
+        $factory = new DomainFactory();
+
+        $defs = $factory->parse('bbb', 'null', CaseSensor::LowerSnake());
+
+        $this->assertInstanceOf(Domain\VoidDomain::class, $defs);
+        $this->assertEquals(['bbb' => null], $defs->expandTypes(['bbb'], 'bbb', 123, CaseSensor::LowerSnake()));
+        $this->assertEquals(['bbb' => null], $defs->expandValues(['bbb'], 'bbb', 123, CaseSensor::LowerSnake()));
+        $this->assertEquals(null, $defs->convertResults('123', new SqlitePlatform(), CaseSensor::LowerSnake()));
+    }
+    
+    /**
+     * @test
+     */
     public function test_built_in_domain()
     {
         $factory = new DomainFactory();
@@ -30,6 +46,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::INTEGER, $defs->getType());
         $this->assertEquals(['bbb' => Type::getType(Type::INTEGER)], $defs->expandTypes(['bbb'], 'bbb', 123, CaseSensor::LowerSnake()));
         $this->assertEquals(['bbb' => 123], $defs->expandValues(['bbb'], 'bbb', 123, CaseSensor::LowerSnake()));
+        $this->assertEquals(123, $defs->convertResults('123', new SqlitePlatform(), CaseSensor::LowerSnake()));
 
         $defs = $factory->parse('bbb', 'boolean', CaseSensor::LowerSnake());
 
@@ -37,6 +54,8 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::BOOLEAN, $defs->getType());
         $this->assertEquals(['bbb' => Type::getType(Type::BOOLEAN)], $defs->expandTypes(['bbb'], 'bbb', false, CaseSensor::LowerSnake()));
         $this->assertEquals(['bbb' => false], $defs->expandValues(['bbb'], 'bbb', false, CaseSensor::LowerSnake()));
+        $this->assertEquals(true, $defs->convertResults('1', new SqlitePlatform(), CaseSensor::LowerSnake()));
+        $this->assertEquals(false, $defs->convertResults('0', new SqlitePlatform(), CaseSensor::LowerSnake()));
 
         $defs = $factory->parse('bbb', 'float', CaseSensor::LowerSnake());
 
@@ -44,6 +63,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::FLOAT, $defs->getType());
         $this->assertEquals(['bbb' => Type::getType(Type::FLOAT)], $defs->expandTypes(['bbb'], 'bbb', 98.7, CaseSensor::LowerSnake()));
         $this->assertEquals(['bbb' => 98.7], $defs->expandValues(['bbb'], 'bbb', 98.7, CaseSensor::LowerSnake()));
+        $this->assertEquals(0.123, $defs->convertResults('0.123', new SqlitePlatform(), CaseSensor::LowerSnake()));
 
         $defs = $factory->parse('bbb', 'string', CaseSensor::LowerSnake());
 
@@ -51,6 +71,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::STRING, $defs->getType());
         $this->assertEquals(['bbb' => Type::getType(Type::STRING)], $defs->expandTypes(['bbb'], 'bbb', 'qwerty', CaseSensor::LowerSnake()));
         $this->assertEquals(['bbb' => 'qwerty'], $defs->expandValues(['bbb'], 'bbb', 'qwerty', CaseSensor::LowerSnake()));
+        $this->assertEquals('2345', $defs->convertResults(2345, new SqlitePlatform(), CaseSensor::LowerSnake()));
     }
 
     /**
@@ -66,6 +87,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::INTEGER, $defs->getType());
         $this->assertEquals(['aaa' => Type::getType(Type::INTEGER)], $defs->expandTypes(['aaa'], 'aaa', 123, CaseSensor::LowerSnake()));
         $this->assertEquals(['aaa' => 123], $defs->expandValues(['aaa'], 'aaa', 123, CaseSensor::LowerSnake()));
+        $this->assertEquals(123, $defs->convertResults('123', new SqlitePlatform(), CaseSensor::LowerSnake()));
 
         $defs = $factory->parse('aaa', 'double', CaseSensor::LowerSnake());
 
@@ -73,6 +95,7 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::FLOAT, $defs->getType());
         $this->assertEquals(['aaa' => Type::getType(Type::FLOAT)], $defs->expandTypes(['aaa'], 'aaa', 12.34, CaseSensor::LowerSnake()));
         $this->assertEquals(['aaa' => 12.34], $defs->expandValues(['aaa'], 'aaa', 12.34, CaseSensor::LowerSnake()));
+        $this->assertEquals(0.123, $defs->convertResults('0.123', new SqlitePlatform(), CaseSensor::LowerSnake()));
 
         $defs = $factory->parse('aaa', 'bool', CaseSensor::LowerSnake());
 
@@ -80,6 +103,8 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::BOOLEAN, $defs->getType());
         $this->assertEquals(['aaa' => Type::getType(Type::BOOLEAN)], $defs->expandTypes(['aaa'], 'aaa', true, CaseSensor::LowerSnake()));
         $this->assertEquals(['aaa' => true], $defs->expandValues(['aaa'], 'aaa', true, CaseSensor::LowerSnake()));
+        $this->assertEquals(true, $defs->convertResults('1', new SqlitePlatform(), CaseSensor::LowerSnake()));
+        $this->assertEquals(false, $defs->convertResults('0', new SqlitePlatform(), CaseSensor::LowerSnake()));
 
         $defs = $factory->parse('aaa', '\DateTime', CaseSensor::LowerSnake());
 
@@ -87,12 +112,13 @@ class DomainFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Type::DATETIME, $defs->getType());
         $this->assertEquals(['aaa' => Type::getType(Type::DATETIME)], $defs->expandTypes(['aaa'], 'aaa', new \DateTime('2015/4/16'), CaseSensor::LowerSnake()));
         $this->assertEquals(['aaa' => new \DateTime('2015/4/16')], $defs->expandValues(['aaa'], 'aaa', new \DateTime('2015/4/16'), CaseSensor::LowerSnake()));
+        $this->assertEquals(new \DateTime('2015/4/16'), $defs->convertResults('2015/4/16', new SqlitePlatform(), CaseSensor::LowerSnake()));
     }
 
     /**
      * @test
      */
-    public function test_built_array()
+    public function test_array()
     {
         $factory = new DomainFactory();
 

@@ -70,8 +70,8 @@ class DaoBase
                 if (count($outValues) > 0) {
                     return $outValues;
                 }
-                elseif ($rows = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                    return $rows;
+                elseif ($stmt->columnCount() > 0) {
+                    return $stmt->fetch(\PDO::FETCH_ASSOC);
                 }
                 else {
                     return $stmt->rowCount();
