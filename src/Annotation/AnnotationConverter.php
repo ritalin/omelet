@@ -121,6 +121,7 @@ class AnnotationConverter
             'float', 'double',
             'string', 'array',
             'mixed', 'string',
+            'null',
         ];
 
         if (($p = strrpos($type, '[]')) !== false) {
